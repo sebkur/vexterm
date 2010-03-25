@@ -1,0 +1,29 @@
+
+
+{
+	gtk_text_layout_wrap
+	Memcheck:Leak
+	fun:realloc
+	...
+	fun:gtk_text_layout_wrap
+	...
+	fun:*
+}
+{
+	Fc_
+	Memcheck:Leak
+	fun:realloc
+	...
+	fun:Fc*
+	...
+	fun:*
+}
+{
+	gtk_init	
+	Memcheck:Leak
+	fun:malloc
+	...
+	fun:gtk_init
+	...
+	fun:*
+}

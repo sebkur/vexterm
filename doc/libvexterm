@@ -1,0 +1,79 @@
+This is an overview of the files existing in the libvexterm-directory
+
+*** actions.h *******************************************************************
+currently does nothing. planned to be used as a header collecting the possible
+actions that are used within terminal_widget to make the whole parsing thing a
+bit more structured.
+
+*** csi.c ***********************************************************************
+*** csi.h ***********************************************************************
+defines a structure 'Csi' which encapsulates a so called Csi-escape-sequence and
+also a helper-function to extract information out of such a struct.
+
+*** debugger_control.c **********************************************************
+*** debugger_control.h **********************************************************
+a widget that can be used to control a 'terminal_debugger'-instance
+
+*** history.c *******************************************************************
+*** history.h *******************************************************************
+this class stores a terminal_widget's history (the scrollback-buffer)
+
+*** iso2022.c *******************************************************************
+*** iso2022.h *******************************************************************
+this is used for conversion of the 'special charachters' a terminal-application
+cas use for drawing things onto the terminal by using charset #0. (e.g. mocp is 
+using that)
+
+*** marshal.c *******************************************************************
+*** marshal.h *******************************************************************
+*** marshal.list ****************************************************************
+'marshal.list' generates 'marshal.h' and 'marshal.c' by use of glib-genmarshal.
+Used for custom signals in classes.
+
+*** terminal.c ******************************************************************
+*** terminal.h ******************************************************************
+this class wraps the pseudo terminal in a seperate thread. it feeds a
+'terminal_handler' with chars and escape-sequences by using the terminal_handler's
+interface functions and also provides the master-file-descriptor for 'talking' to 
+the pty.
+
+*** terminal_colour_palette.c ***************************************************
+*** terminal_colour_palette.h ***************************************************
+a palette that a terminal_widget uses to display charachters on the screen.
+
+*** terminal_config.c ***********************************************************
+*** terminal_config.h ***********************************************************
+a configuration that is used by a terminal_widget. contains information about the
+font to use and also a colour_palette.
+
+*** terminal_debugger.c *********************************************************
+*** terminal_debugger.h *********************************************************
+implements terminal_handler. may be put between 'terminal' and 'terminal_widget'
+in a pipeline-fashion. Thus some debugging can be performed without distorting
+the terminal_widget's source code.
+
+*** terminal_handler.c **********************************************************
+*** terminal_handler.h **********************************************************
+the interface used by 'terminal' to deliver information to an implementor like 
+'terminal_widget' or 'terminal_debugger'. the main interface-function are:
+'handle_ascii', 'handle_utf8', 'handle_csi' and 'handle_escaped'.
+There are some more.
+
+*** terminal_status_bar.c *******************************************************
+*** terminal_status_bar.h *******************************************************
+a status bar that displays some information about a terminal_widget.
+(like currently used screen (normal/alternate), window size (in chars))
+
+*** terminal_widget.c ***********************************************************
+*** terminal_widget.h ***********************************************************
+the main widget for displaying a terminal. implements 'terminal_handler'. the
+most complex class in the package since it does a whole lot of things:
+
+> put received charachters onto the screen
+> handle escape sequences
+> perform drawing, cacheing
+> handle keyboard input
+
+*** vte_fascade *****************************************************************
+this fascade is intended to let libvexterm work as a drop-in-replacement for 
+libvte. not implemented at all.

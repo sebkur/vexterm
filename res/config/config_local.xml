@@ -1,0 +1,95 @@
+<!-- Configuration file for VexTerm -->
+<configuration>
+
+	<preferences profile="bar">
+		<debug scrolling-region="no" status-bar="yes" />
+	</preferences>
+
+	<profiles>
+		<profile name="foo">
+			<font name="Courier" size="9" />
+			<colours scheme="default" />
+		</profile>
+		<profile name="bar">
+			<font name="Monospace" size="10" />
+			<colours scheme="smooth" />
+		</profile>
+		<profile name="boo">
+			<font name="Monospace" size="10" />
+			<colours scheme="hacker" />
+		</profile>
+	</profiles>
+
+	<colourschemes>
+		<colourscheme name="default">
+			<!-- foreground, background -->
+			<colour encoding="hex16" r="0x0000" g="0x0000" b="0x0000" a="0xFFFF" /> <!-- foreground -->
+			<colour encoding="hex16" r="0xFFFF" g="0xFFFF" b="0xFFFF" a="0xFFFF" /> <!-- background -->
+			<!-- normal colours -->
+			<colour encoding="hex16" r="0x0000" g="0x0000" b="0x0000" a="0xFFFF" /> <!-- black -->
+			<colour encoding="hex16" r="0xAA00" g="0x0000" b="0x0000" a="0xFFFF" /> <!-- red -->
+			<colour encoding="hex16" r="0x0000" g="0xAA00" b="0x0000" a="0xFFFF" /> <!-- green -->
+			<colour encoding="hex16" r="0xAA00" g="0x5500" b="0x0000" a="0xFFFF" /> <!-- brown -->
+			<colour encoding="hex16" r="0x0000" g="0x0000" b="0xAA00" a="0xFFFF" /> <!-- blue -->
+			<colour encoding="hex16" r="0xAA00" g="0x0000" b="0xAA00" a="0xFFFF" /> <!-- purple -->
+			<colour encoding="hex16" r="0x0000" g="0xAA00" b="0xAA00" a="0xFFFF" /> <!-- magenta -->
+			<colour encoding="hex16" r="0xAA00" g="0xAA00" b="0xAA00" a="0xFFFF" /> <!-- grey -->
+			<!-- highlighted colours -->
+			<colour encoding="hex16" r="0x5500" g="0x5500" b="0x5500" a="0xFFFF" /> 
+			<colour encoding="hex16" r="0xFFFF" g="0x5500" b="0x5500" a="0xFFFF" /> 
+			<colour encoding="hex16" r="0x5500" g="0xFFFF" b="0x5500" a="0xFFFF" /> 
+			<colour encoding="hex16" r="0xFFFF" g="0xFFFF" b="0x5500" a="0xFFFF" /> 
+			<colour encoding="hex16" r="0x5500" g="0x5500" b="0xFFFF" a="0xFFFF" /> 
+			<colour encoding="hex16" r="0xFFFF" g="0x5500" b="0xFFFF" a="0xFFFF" /> 
+			<colour encoding="hex16" r="0x5500" g="0xFFFF" b="0xFFFF" a="0xFFFF" /> 
+			<colour encoding="hex16" r="0xFFFF" g="0xFFFF" b="0xFFFF" a="0xFFFF" /> 
+		</colourscheme>
+		<colourscheme name="hacker">
+			<!-- foreground, background -->
+			<colour encoding="hex16" r="0x0000" g="0xFFFF" b="0x0000" a="0xFFFF" />
+			<colour encoding="hex16" r="0x0000" g="0x0000" b="0x0000" a="0xFFFF" />
+			<!-- normal colours -->
+			<colour encoding="hex16" r="0x0000" g="0x0000" b="0x0000" a="0xFFFF" /> <!-- black -->
+			<colour encoding="hex16" r="0xAA00" g="0x0000" b="0x0000" a="0xFFFF" /> <!-- red -->
+			<colour encoding="hex16" r="0x0000" g="0xAA00" b="0x0000" a="0xFFFF" /> <!-- green -->
+			<colour encoding="hex16" r="0xAA00" g="0x5500" b="0x0000" a="0xFFFF" /> <!-- brown -->
+			<colour encoding="hex16" r="0x0000" g="0x0000" b="0xAA00" a="0xFFFF" /> <!-- blue -->
+			<colour encoding="hex16" r="0xAA00" g="0x0000" b="0xAA00" a="0xFFFF" /> <!-- purple -->
+			<colour encoding="hex16" r="0x0000" g="0xAA00" b="0xAA00" a="0xFFFF" /> <!-- magenta -->
+			<colour encoding="hex16" r="0xAA00" g="0xAA00" b="0xAA00" a="0xFFFF" /> <!-- grey -->
+			<!-- highlighted colours -->
+			<colour encoding="hex16" r="0x5500" g="0x5500" b="0x5500" a="0xFFFF" /> 
+			<colour encoding="hex16" r="0xFFFF" g="0x5500" b="0x5500" a="0xFFFF" /> 
+			<colour encoding="hex16" r="0x5500" g="0xFFFF" b="0x5500" a="0xFFFF" /> 
+			<colour encoding="hex16" r="0xFFFF" g="0xFFFF" b="0x5500" a="0xFFFF" /> 
+			<colour encoding="hex16" r="0x5500" g="0x5500" b="0xFFFF" a="0xFFFF" /> 
+			<colour encoding="hex16" r="0xFFFF" g="0x5500" b="0xFFFF" a="0xFFFF" /> 
+			<colour encoding="hex16" r="0x5500" g="0xFFFF" b="0xFFFF" a="0xFFFF" /> 
+			<colour encoding="hex16" r="0x2200" g="0x2200" b="0x2200" a="0xFFFF" /> 
+		</colourscheme>
+		<colourscheme name="smooth">
+			<!-- foreground, background -->
+			<colour encoding="hex16" r="0xDDDD" g="0xDDDD" b="0xDDDD" a="0xFFFF" />
+			<colour encoding="hex16" r="0x3333" g="0x3333" b="0x3333" a="0xFFFF" />
+			<!-- normal colours -->
+			<colour encoding="hex16" r="0x0000" g="0x0000" b="0x0000" a="0xFFFF" /> <!-- black -->
+			<colour encoding="hex16" r="0xfA00" g="0x6000" b="0x6000" a="0xFFFF" /> <!-- red -->
+			<colour encoding="hex16" r="0x0000" g="0xAA00" b="0x0000" a="0xFFFF" /> <!-- green -->
+			<colour encoding="hex16" r="0xAA00" g="0x5500" b="0x0000" a="0xFFFF" /> <!-- brown -->
+			<colour encoding="hex16" r="0x6000" g="0x6000" b="0xcA00" a="0xFFFF" /> <!-- blue -->
+			<colour encoding="hex16" r="0xcA00" g="0x4000" b="0xcA00" a="0xFFFF" /> <!-- purple -->
+			<colour encoding="hex16" r="0x4000" g="0xcA00" b="0xcA00" a="0xFFFF" /> <!-- magenta -->
+			<colour encoding="hex16" r="0xAA00" g="0xAA00" b="0xAA00" a="0xFFFF" /> <!-- grey -->
+			<!-- highlighted colours -->
+			<colour encoding="hex16" r="0x5500" g="0x5500" b="0x5500" a="0xFFFF" /> 
+			<colour encoding="hex16" r="0xFFFF" g="0x5500" b="0x5500" a="0xFFFF" /> 
+			<colour encoding="hex16" r="0x5500" g="0xAAAA" b="0x5500" a="0xFFFF" /> 
+			<colour encoding="hex16" r="0xFFFF" g="0xFFFF" b="0x5500" a="0xFFFF" /> 
+			<colour encoding="hex16" r="0x5500" g="0x5500" b="0xFFFF" a="0xFFFF" /> 
+			<colour encoding="hex16" r="0xFFFF" g="0x5500" b="0xFFFF" a="0xFFFF" /> 
+			<colour encoding="hex16" r="0x5500" g="0xAAAA" b="0xFDDD" a="0xFDDD" /> 
+			<colour encoding="hex16" r="0x2200" g="0x2200" b="0x2200" a="0xFFFF" /> 
+		</colourscheme>
+	</colourschemes>
+
+</configuration>

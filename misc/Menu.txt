@@ -1,0 +1,16 @@
+_File;
+ Open new _Window;	menu_file_new_window
+ Open new _Tab;		menu_file_new_tab
+ _Quit;			menu_file_quit
+_View;
+ _Fullscreen;		menu_view_fullscreen;		check
+_Options;
+ _Preferences;		menu_options_preferences
+_Profile;		menu_profiles
+_Debug;
+ Show Scrolling _Region;menu_show_scrolling_region;	check
+ Show _Status Bar;	menu_show_status_bar;		check
+_Help;
+ _Manual;		menu_help_manual
+ _About vexterm;	menu_help_about_vexterm
+ _License;		menu_help_license

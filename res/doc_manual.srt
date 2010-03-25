@@ -1,0 +1,76 @@
+<document>
+<style name="headbold" size="12" weight="bold" />
+<style name="head" size="12" />
+<style name="key" size="9" font="Monospace" weight="bold" />
+<style name="val" size="9" />
+<style name="body" size="9" />
+<style name="contentlist" size="11" />
+
+<font style="body">
+<font style="headbold">Manual for VexTerm</font>
+<br /><br />
+<font style="head">Contents</font>
+<font style="contentlist">
+<br /><br />
+• Introduction
+<br />
+• Key Bindings
+</font>
+<br /><br />
+<font style="head">Introduction</font>
+<br /><br />
+The way VexTerm looks and how it is used is oriented towards 
+the popular Gnome-Terminal. Thus, for example, the predefined 
+keyboard shortcuts are setup as in Gnome-Terminal. 
+<br /><br />
+Even though, VexTerm has not too much in common with Gnome-Terminal 
+internally. While Gnome-Terminal is based on libvte (basically a 
+widget for gtk for displaying a virtual terminal emulator), VexTerm 
+uses its own library for performing this task. Hereby it tries to be 
+a little faster than libvte while still looking quite smooth by using 
+pango for laying out characters on the screen. 
+<br /><br />
+VexTerm is still in early development stage and is far from complete. 
+Most importantly, many features of the vt102-console have not been 
+implemented, yet. Even though, it already works quite well for many 
+popular applications. The interpretation of the ASCII control sequences 
+is aimed to be matching xterm's.
+<br /><br />
+Apropos du xterm. VexTerm's goal is to be (nearly) as fast as xterm while looking 
+as nice as libvte.
+
+
+<br /><br />
+<font style="head">Key Bindings</font>
+<br /><br />
+<font style="key">Shift + PageUp:               </font>
+<font style="val">Scroll a page upwards</font>
+<br />
+<font style="key">Shift + PageDown:             </font>
+<font style="val">Scroll a page downwards</font>
+<br />
+<font style="key">Shift + CursorUp:             </font>
+<font style="val">Scroll a line upwards</font>
+<br />
+<font style="key">Shift + CursorDown:           </font>
+<font style="val">Scroll a line downwards</font>
+<br /><br />
+<font style="key">Ctrl + PageUp:                </font>
+<font style="val">Go to previous tab</font>
+<br />
+<font style="key">Ctrl + PageDown:              </font>
+<font style="val">Go to next tab</font>
+<br />
+<font style="key">Ctrl + Shift + PageUp:        </font>
+<font style="val">Move tab to the left</font>
+<br />
+<font style="key">Ctrl + Shift + PageDown:      </font>
+<font style="val">Move tab to the right</font>
+<br /><br />
+<font style="key">Ctrl + Shift + T:             </font>
+<font style="val">Open new tab</font>
+<br />
+<font style="key">Ctrl + Shift + W:             </font>
+<font style="val">Close current tab</font>
+</font>
+</document>

@@ -1,0 +1,57 @@
+TODO List for vexterm
+
+VexTerm - Virtually Emulating Xterm
+
+*******************************************************************
+*** DONE THINGS: **************************************************
+*******************************************************************
+DONE limit for history
+
+DONE get PWD from terminal_widget / gx_single
+DONE set PWD for terminal_widget / gx_single
+
+DONE tabs
+DONE menubar
+DONE use popt
+DONE manual/about/license display
+DONE icon
+DONE allow closing of tabs by Ctrl+Shift+W and by close-button
+DONE manual/about/license content
+
+*******************************************************************
+*** BUGS: *********************************************************
+*******************************************************************
+FIXED cursor is still visible if scrolled up one line and the 
+widget's size is bigger than the space taken by the actual terminal
+
+FIXED about widget displays junk when logo/documents cannot be 
+found
+
+*******************************************************************
+*** STILL TO DO: **************************************************
+*******************************************************************
+on terminal_widget: emit a signal on change of title
+finaliziation of several objects
+scroll bars
+configuration
+	- global / local layers
+	- let commandline option overrule config
+preferences dialog
+diagnostics for current session
+	- length of buffer
+	- size / structure of cached x-drawables
+optimization for drawing
+	- line-buffering (maybe)
+	- partial redraw if only one line changed
+limit size of cached pixels / replacement strategy
+README
+docuemtation
+create an fascade as a drop-in replacement for libvte
+selection of charachters currently on screen
+
+*******************************************************************
+*** ;) ************************************************************
+*******************************************************************
+plant a tree
+build a house
+start driving a porsche

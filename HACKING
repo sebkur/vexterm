@@ -1,0 +1,19 @@
+HACKING on vexterm
+
+*******************************************************************
+*** Documentation: ************************************************
+*******************************************************************
+Some documentation should be found in the 'doc'-directory. There's 
+not too much currently, but i'm planning to create some UML-
+diagrams concerning libvexterm's internals.
+
+*******************************************************************
+*** Creating new classes: *****************************************
+*******************************************************************
+Vexterm uses glib for object-orientation. Creating new glib-classes
+involves writing quite a bit of repeating code. To simplifiy this 
+task there's a script 'misc/create_type.py'. It accepts some 
+parameters to generate a new class suitable for use in vexterm.
+To get a list of accepted parameters just call the script without
+any parameters. The script will create both a '.c' and a '.h' 
+file for you.

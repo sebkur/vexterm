@@ -1,0 +1,12 @@
+#!/bin/bash
+#printf "\033[12;1Hasdf"
+printf "\033[?1049h"
+printf "\033[12;1Hasdf"
+printf "\033[2;6r"
+printf "\033[2;1Ha"
+printf "\033[3;1Hb"
+printf "\033[4;1Hc"
+printf "\033[5;1Hd"
+printf "\033[6;1He"
+#printf "\033[1M"
+#printf "\033[44;1H"
