@@ -68,6 +68,7 @@ static void vex_term_notebook_switch_page_cb(GtkNotebook * nb, GtkNotebookPage *
 static gboolean vex_term_key_press_cb(GtkWidget * widget, GdkEventKey * event, VexTerm * vex_term);
 static void vex_term_exited_cb(VexSingle * vex_single, VexTerm * vex_term);
 static gboolean vex_term_close_button_clicked_cb(GtkWidget * widget, VexTerm * vex_term);
+static gboolean vex_term_menu_button_clicked_cb(GtkWidget * widget, VexTerm * vex_term);
 void vex_term_kill_terminal(VexSingle * vex);
 
 static void menubar_scrolling_region_cb(GtkWidget * widget, VexTerm * vex_term);
@@ -216,9 +217,11 @@ void vex_term_add_tab(VexTerm * vex_term)
 	vex_single_set_show_scrolling_region(vex, vex_term -> show_scrolling_region);
 
 	/* add it to the notebook */
+	/* here's the tab box that contains the widgets in the tab-header */
 	GtkWidget * label = gtk_hbox_new(FALSE, 0);
+	/* a label with text */
 	GtkWidget * label_label = gtk_label_new("term");
-
+	/* the close button */
 	GtkWidget * label_button = gtk_button_new();
 	GtkWidget * image_close = gtk_image_new_from_stock(GTK_STOCK_CLOSE, GTK_ICON_SIZE_MENU);
 	gtk_container_add(GTK_CONTAINER(label_button), image_close);
@@ -229,9 +232,16 @@ void vex_term_add_tab(VexTerm * vex_term)
 		GTK_ICON_SIZE_MENU, &button_width, &button_height);
 	//TODO: this is not nice
 	gtk_widget_set_size_request(label_button, button_width + 4, button_height + 4);
-
+	/* put the button additonally into a vbox */
 	GtkWidget * label_vbox = gtk_vbox_new(FALSE, 0);
 	gtk_box_pack_end(GTK_BOX(label_vbox), label_button, FALSE, FALSE, 0);
+
+	/* the menu */
+	GtkWidget * label_menu = gtk_button_new();
+	gtk_button_set_focus_on_click(GTK_BUTTON(label_menu), FALSE);
+	gtk_widget_set_size_request(label_menu, button_width + 4, button_height + 4);
+
+	gtk_box_pack_start(GTK_BOX(label), label_menu, FALSE, FALSE, 0);
 	gtk_box_pack_start(GTK_BOX(label), label_label, TRUE, TRUE, 0);
 	gtk_box_pack_start(GTK_BOX(label), label_vbox, FALSE, FALSE, 0);
 	gtk_widget_show_all(label);
@@ -246,6 +256,9 @@ void vex_term_add_tab(VexTerm * vex_term)
 		G_OBJECT(label_button), "clicked",
 		G_CALLBACK(vex_term_close_button_clicked_cb), vex_term);
 	g_signal_connect(
+		G_OBJECT(label_menu), "clicked",
+		G_CALLBACK(vex_term_menu_button_clicked_cb), vex_term);
+	g_signal_connect(
 		G_OBJECT(vex -> terminal_widget), "key-press-event",
 		G_CALLBACK(vex_term_key_press_cb), vex_term);
 	g_signal_connect(
@@ -255,6 +268,18 @@ void vex_term_add_tab(VexTerm * vex_term)
 	/* and show it */
 	gtk_widget_show_all(GTK_WIDGET(vcs));
 	gtk_notebook_set_current_page(nb, p);
+}
+
+static gboolean vex_term_menu_button_clicked_cb(GtkWidget * widget, VexTerm * vex_term)
+{
+	GtkWidget * menu = gtk_menu_new();
+	GtkWidget * split_v = gtk_menu_item_new_with_label("split vertically");
+	GtkWidget * split_h = gtk_menu_item_new_with_label("split horizontally");
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), split_v);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), split_h);
+	gtk_widget_show_all(menu);
+	gtk_menu_popup(GTK_MENU(menu), NULL, NULL, NULL, NULL, 1, gtk_get_current_event_time());
+	return FALSE;
 }
 
 void vex_term_kill_terminal(VexSingle * vex)
