@@ -73,6 +73,16 @@ typedef struct {
 	char character_set;
 } TerminalScreen;
 
+typedef struct {
+	int col;
+	int row;
+} TerminalPosition;
+
+typedef struct {
+	TerminalPosition start;
+	TerminalPosition end;
+} TerminalSelection;
+
 struct _TerminalWidget
 {
 	GtkDrawingArea parent;
@@ -132,7 +142,14 @@ struct _TerminalWidget
 	History * history;
 	int history_pos;
 
+	/* mouse stuff */
 	gboolean mouse_left_pressed;
+	int mouse_press_x;
+	int mouse_press_y;
+	gboolean selection_active;
+	TerminalPosition pos_press;
+	TerminalPosition pos_motion;
+	TerminalSelection selection;
 };
 
 struct _TerminalWidgetClass

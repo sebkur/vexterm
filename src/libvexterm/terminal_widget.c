@@ -352,7 +352,17 @@ static void terminal_widget_init(TerminalWidget *terminal_widget)
 
 	terminal_widget -> ascent = -1;
 
+	/* mouse stuff */
 	terminal_widget -> mouse_left_pressed = FALSE;
+	terminal_widget -> selection_active = FALSE;
+	terminal_widget -> mouse_press_x = 0;
+	terminal_widget -> mouse_press_y = 0;
+	terminal_widget -> pos_press.col = 0;
+	terminal_widget -> pos_press.row = 0;
+	terminal_widget -> selection.start.col = 0;
+	terminal_widget -> selection.start.row = 0;
+	terminal_widget -> selection.end.col = 0;
+	terminal_widget -> selection.end.row = 0;
 }
 
 void terminal_widget_constructor(TerminalWidget * terminal_widget)
@@ -682,6 +692,14 @@ void send_keypad(TerminalWidget * terminal_widget, int key) // xterm doc
 Mouse Handling
 ****************************************************************/
 
+gboolean terminal_widget_pos_smaller(TerminalPosition p1, TerminalPosition p2){
+	if (p1.row == p2.row){
+		return p1.col < p2.col;
+	}else{
+		return p1.row < p2.row;
+	}
+}
+
 void terminal_widget_get_position(TerminalWidget * terminal_widget, double wx, double wy, int * x, int * y)
 {
 	*x = (int) (wx / terminal_widget -> c_w);
@@ -691,6 +709,8 @@ void terminal_widget_get_position(TerminalWidget * terminal_widget, double wx, d
 static gboolean terminal_widget_button_press(GtkWidget * widget, GdkEventButton * event)
 {
 	TerminalWidget * terminal_widget = (TerminalWidget*) widget;
+	terminal_widget -> mouse_press_x = (int) event -> x;
+	terminal_widget -> mouse_press_y = (int) event -> y;
 	int x, y;
 	terminal_widget_get_position(terminal_widget, event -> x, event -> y, &x, &y);
 	if (event -> button == 1){
@@ -698,6 +718,12 @@ static gboolean terminal_widget_button_press(GtkWidget * widget, GdkEventButton 
 		#if DEBUG_MOUSE
 		printf("press %d %d\n", x, y);
 		#endif
+		terminal_widget -> pos_press.col = x;
+		terminal_widget -> pos_press.row = y;
+		terminal_widget -> pos_motion.row = -1;
+		terminal_widget -> pos_motion.col = -1;
+		terminal_widget -> selection_active = FALSE;
+		gtk_widget_queue_draw(widget);
 	}
 	return FALSE;
 }
@@ -709,6 +735,8 @@ static gboolean terminal_widget_button_release(GtkWidget * widget, GdkEventButto
 	terminal_widget_get_position(terminal_widget, event -> x, event -> y, &x, &y);
 	if (event -> button == 1){
 		terminal_widget -> mouse_left_pressed = FALSE;
+		terminal_widget -> pos_motion.col = -1;
+		terminal_widget -> pos_motion.row = -1;
 		#if DEBUG_MOUSE
 		printf("release %d %d\n", x, y);
 		#endif
@@ -725,6 +753,20 @@ static gboolean terminal_widget_motion_notify(GtkWidget * widget, GdkEventMotion
 		#if DEBUG_MOUSE_MOTION
 		printf("motion %d %d\n", x, y);
 		#endif
+		if (terminal_widget -> pos_motion.col != x || terminal_widget -> pos_motion.row != y){
+			terminal_widget -> pos_motion.col = x;
+			terminal_widget -> pos_motion.row = y;
+			TerminalPosition pos; pos.col = x; pos.row = y;
+			if (terminal_widget_pos_smaller(pos, terminal_widget -> pos_press)){
+				terminal_widget -> selection.start = pos;
+				terminal_widget -> selection.end = terminal_widget -> pos_press;
+			}else{
+				terminal_widget -> selection.start = terminal_widget -> pos_press;
+				terminal_widget -> selection.end = pos;
+			}
+			terminal_widget -> selection_active = TRUE;
+			gtk_widget_queue_draw(widget);
+		}
 	}
 	return FALSE;
 }
@@ -885,6 +927,23 @@ int time_cacheing;
 int time_blitting;
 #endif 
 
+gboolean pixel_is_selected(TerminalWidget * terminal_widget, int col, int row)
+{
+	gboolean ret = FALSE;
+	if (row > terminal_widget -> selection.start.row && row < terminal_widget -> selection.end.row){
+		ret = TRUE;
+	}else if (row == terminal_widget -> selection.start.row || row == terminal_widget -> selection.end.row){
+		ret = TRUE;
+		if (row == terminal_widget -> selection.start.row){
+			ret &= col >= terminal_widget -> selection.start.col;
+		}
+		if (row == terminal_widget -> selection.end.row){
+			ret &= col <= terminal_widget -> selection.end.col;
+		}
+	}
+	return ret;
+}
+
 void draw_row(TerminalWidget * terminal_widget, 
 	PangoFontMap * font_map, PangoFontDescription * desc, PangoFontDescription * desc_bold,
 	PangoAttrList * attrs, PangoAttrList * attrs_bold, GdkGC * gc,
@@ -908,6 +967,9 @@ void draw_row(TerminalWidget * terminal_widget,
 
 		int fgc, bgc;
 		pixel_to_indices(pixel, &fgc, &bgc);
+		if (terminal_widget -> selection_active && pixel_is_selected(terminal_widget, c, r)){
+			int t = fgc; fgc = bgc; bgc = t;
+		}
 		int fgc_cache = PIXEL_IS_HIGHLIGHTED(pixel) ? fgc + 18 : fgc;
 
 		GSequence * cache = terminal_widget -> cache[bgc][fgc_cache];
@@ -1037,6 +1099,7 @@ static gboolean terminal_widget_expose(GtkWidget * widget, GdkEventExpose * even
 
 	pthread_mutex_lock(&terminal_widget -> mutex);
 
+	/* background */
 	cairo_pattern_t * pattern_bg = terminal_widget -> pattern_bg;
 	cairo_set_source_rgba(cr, 1.0, 1.0, 1.0, 1.0);
 	cairo_rectangle(cr, 0, 0, widget -> allocation.width, widget -> allocation.height);
@@ -1045,6 +1108,29 @@ static gboolean terminal_widget_expose(GtkWidget * widget, GdkEventExpose * even
 	cairo_rectangle(cr, 0, 0, widget -> allocation.width, widget -> allocation.height);
 	cairo_fill(cr);
 
+	/* selected part */
+	if (terminal_widget -> selection_active){
+		int c1 = terminal_widget -> selection.start.col;
+		int r1 = terminal_widget -> selection.start.row;
+		int c2 = terminal_widget -> selection.end.col;
+		int r2 = terminal_widget -> selection.end.row;
+		int w = terminal_widget -> c_w;
+		int h = terminal_widget -> c_h;
+		cairo_set_source(cr, terminal_widget -> pattern_fg);
+		if (r1 == r2){
+			cairo_rectangle(cr, c1 * w, r1 * h, (c2 - c1) * w, h);
+		}else{
+			/* first line */
+			cairo_rectangle(cr, c1 * w, r1 * h, widget -> allocation.width, h);
+			/* middle */
+			cairo_rectangle(cr, 0, (r1 + 1) * h, widget -> allocation.width, (r2 - r1 - 1) * h);
+			/* last line */
+			cairo_rectangle(cr, 0, r2 * h, c2 * w, h);
+		}
+		cairo_fill(cr);
+	}
+
+	/* rows */
 	GdkGC * gc = gdk_gc_new(widget -> window); // memory ok
 
 	#if DEBUG_RENDERING_TIME
