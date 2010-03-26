@@ -83,6 +83,9 @@ void vex_term_add_profile_entry(VexTerm * vex_term, char * name);
 void vex_term_remove_profile_entry(VexTerm * vex_term, char * name);
 void vex_term_rename_profile_entry(VexTerm * vex_term, char * name, char * new_name);
 
+void vex_term_toggle_fullscreen(VexTerm * vex_term);
+void vex_term_toggle_menu(VexTerm * vex_term);
+
 GtkWidget * vex_term_new(VexLayeredConfig * vlc)
 {
 	VexTerm * vex_term = g_object_new(VEX_TYPE_VEX_TERM, NULL);
@@ -114,6 +117,7 @@ void vex_term_constructor(VexTerm * vex_term, VexLayeredConfig * vlc)
 	vex_term -> notebook = gtk_notebook_new();
 	vex_term -> current_index = 0;
 	vex_term -> menu = VEX_MENU(menu_new());
+	vex_term -> menu_visible = TRUE;
 	vex_term -> show_status_bar = vex_config_get_show_status_bar(vex_layered_config_get_config_local(vlc));
 	vex_term -> show_scrolling_region = vex_config_get_show_scrolling_region(vex_layered_config_get_config_local(vlc));
 	vex_term -> preferences = NULL;
@@ -361,6 +365,14 @@ static gboolean vex_term_key_press_cb(GtkWidget * widget, GdkEventKey * event, V
 				vex_term_move_tab(vex_term, 1);
 				return TRUE;
 			}
+			case GDK_F10:{
+				vex_term_toggle_menu(vex_term);
+				return TRUE;
+			}
+			case GDK_F11:{
+				vex_term_toggle_fullscreen(vex_term);
+				return TRUE;
+			}
 		}
 		return TRUE;
 	}
@@ -532,5 +544,27 @@ static void vex_term_notebook_switch_page_cb(GtkNotebook * nb, GtkNotebookPage *
 	VexSingleContainer * vcs = VEX_VEX_SINGLE_CONTAINER(gtk_notebook_get_nth_page(nb, pnum));
 	gtk_menu_item_set_submenu(
 		GTK_MENU_ITEM(vex_term -> menu -> menu_profiles), vcs -> menu_profiles);
+}
+
+void vex_term_toggle_fullscreen(VexTerm * vex_term)
+{
+	GtkWidget * widget = find_containing_gtk_window(GTK_WIDGET(vex_term));
+	GdkWindow * window = widget -> window;
+	gboolean fullscreened = (gdk_window_get_state(window) & GDK_WINDOW_STATE_FULLSCREEN) != 0;
+	if (fullscreened){
+		gdk_window_unfullscreen(window);
+	}else{
+		gdk_window_fullscreen(window);
+	}
+}
+
+void vex_term_toggle_menu(VexTerm * vex_term)
+{
+	vex_term -> menu_visible = !vex_term -> menu_visible;
+	if (vex_term -> menu_visible){
+		gtk_widget_show(GTK_WIDGET(vex_term -> menu));
+	}else{
+		gtk_widget_hide(GTK_WIDGET(vex_term -> menu));
+	}
 }
 

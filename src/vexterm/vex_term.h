@@ -55,6 +55,7 @@ struct _VexTerm
 	GtkWidget * notebook;
 
 	Menu * menu;
+	gboolean menu_visible;
 	gboolean show_status_bar;
 	gboolean show_scrolling_region;
 
