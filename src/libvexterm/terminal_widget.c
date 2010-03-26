@@ -1118,14 +1118,14 @@ static gboolean terminal_widget_expose(GtkWidget * widget, GdkEventExpose * even
 		int h = terminal_widget -> c_h;
 		cairo_set_source(cr, terminal_widget -> pattern_fg);
 		if (r1 == r2){
-			cairo_rectangle(cr, c1 * w, r1 * h, (c2 - c1) * w, h);
+			cairo_rectangle(cr, c1 * w, r1 * h, (c2 - c1 + 1) * w, h);
 		}else{
 			/* first line */
 			cairo_rectangle(cr, c1 * w, r1 * h, widget -> allocation.width, h);
 			/* middle */
 			cairo_rectangle(cr, 0, (r1 + 1) * h, widget -> allocation.width, (r2 - r1 - 1) * h);
 			/* last line */
-			cairo_rectangle(cr, 0, r2 * h, c2 * w, h);
+			cairo_rectangle(cr, 0, r2 * h, (c2 + 1) * w, h);
 		}
 		cairo_fill(cr);
 	}
