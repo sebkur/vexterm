@@ -90,6 +90,7 @@
 #include "marshal.h"
 #include "../helpers/tool.h"
 #include "../helpers/util.h"
+#include "../helpers/stringbuffer/string_buffer.h"
 #include "iso2022.h"
 
 #define PIXEL_IS_HIGHLIGHTED(p)		((p -> flags & PIXEL_FLAG_HIGHLIGHTED) != 0)
@@ -150,6 +151,8 @@ void emit_set_size(TerminalWidget * terminal_widget);
 void terminal_widget_constructor(TerminalWidget * terminal_widget);
 void terminal_widget_configure_colour_palette(TerminalWidget * terminal_widget, TerminalColourPalette * palette);
 void terminal_widget_configure_font(TerminalWidget * terminal_widget);
+
+gboolean terminal_widget_get_selected_text(TerminalWidget * terminal_widget, StringBuffer ** buffer);
 
 TerminalWidget * terminal_widget_new()
 {
@@ -251,9 +254,9 @@ void pixel_change(TerminalWidget * terminal_widget, Pixel * pixel, gunichar ucha
 GArray * row_buffer_create(TerminalWidget * terminal_widget)
 {
 	GArray * buffer = g_array_new(FALSE, FALSE, sizeof(GArray*));
-	int r, c;
 	return buffer;
 //	// this is obsolete due to automatic adding of lines TODO: remove
+//	int r, c;
 //	for (r = 0; r < terminal_widget -> n_rows; r++){
 //		GArray * row = g_array_new(FALSE, FALSE, sizeof(Pixel)); // LC
 //		//printf("rows1 %d\n", rcc++);
@@ -740,6 +743,14 @@ static gboolean terminal_widget_button_release(GtkWidget * widget, GdkEventButto
 		#if DEBUG_MOUSE
 		printf("release %d %d\n", x, y);
 		#endif
+		GtkClipboard * cb = gtk_clipboard_get(GDK_SELECTION_CLIPBOARD);
+		StringBuffer * buffer;
+		if (terminal_widget_get_selected_text(terminal_widget, &buffer)){
+			int len;
+			char * text = string_buffer_get_text(buffer, &len);
+			gtk_clipboard_set_text(cb, text, len);
+			string_buffer_free(buffer);
+		}
 	}
 	return FALSE;
 }
@@ -2397,4 +2408,51 @@ gboolean _emit_set_size(TerminalWidget * terminal_widget)
 void emit_set_size(TerminalWidget * terminal_widget)
 {
 	g_idle_add((GSourceFunc)_emit_set_size, terminal_widget);
+}
+
+/* Selection */
+
+void terminal_widget_selection_add(TerminalScreen * screen, StringBuffer * buffer, int r, int c_start, int c_stop)
+{
+	//printf("%d %d\n", r, screen -> rows -> len);
+	if (r >= screen -> rows -> len){
+		return;
+	}
+	GArray * row = g_array_index(screen -> rows, GArray*, r);
+	int c;
+	if (c_stop == -1) c_stop = row -> len - 1;
+	for (c = c_start; c <= c_stop && c < row -> len; c++){
+		Pixel * pixel = &g_array_index(row, Pixel, c);
+		string_buffer_append_unichar(buffer, pixel -> uchar);
+	}
+}
+
+gboolean terminal_widget_get_selected_text(TerminalWidget * terminal_widget, StringBuffer ** buffer)
+{
+	if (!terminal_widget -> selection_active){
+		return FALSE;
+	}
+
+	TerminalScreen * screen = terminal_widget -> screen_current;
+
+	int c1 = terminal_widget -> selection.start.col;
+	int r1 = terminal_widget -> selection.start.row;
+	int c2 = terminal_widget -> selection.end.col;
+	int r2 = terminal_widget -> selection.end.row;
+
+	*buffer = string_buffer_new(1);
+	if (r1 == r2){
+		terminal_widget_selection_add(screen, *buffer, r1, c1, c2);
+	}else{
+		terminal_widget_selection_add(screen, *buffer, r1, c1, -1);
+		string_buffer_append_string(*buffer, "\n", 1);
+		int r;
+		for (r = r1 + 1; r < r2; r++){
+			terminal_widget_selection_add(screen, *buffer, r, 0, -1);
+			string_buffer_append_string(*buffer, "\n", 1);
+		}
+		terminal_widget_selection_add(screen, *buffer, r2, 0, c2);
+	}
+
+	return TRUE;
 }

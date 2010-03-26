@@ -32,6 +32,7 @@ src/helpers/process.c \
 src/helpers/tool.c \
 src/helpers/util.c \
 src/helpers/customio.c \
+src/helpers/stringbuffer/string_buffer.c \
 src/helpers/xmlwriter/xml_document.c \
 src/helpers/xmlwriter/xml_node.c \
 src/gtkplus/seqbox/gtk_seq_box.c \
@@ -82,6 +83,7 @@ src/helpers/process.o \
 src/helpers/tool.o \
 src/helpers/util.o \
 src/helpers/customio.o \
+src/helpers/stringbuffer/string_buffer.o \
 src/helpers/xmlwriter/xml_document.o \
 src/helpers/xmlwriter/xml_node.o \
 src/gtkplus/seqbox/gtk_seq_box.o \
