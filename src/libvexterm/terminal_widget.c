@@ -62,6 +62,9 @@
 #define DEBUG_RENDERING_TIME 1			&& DEBUG_AT_ALL
 #define DEBUG_RENDERING_FONT 1			&& DEBUG_AT_ALL
 
+#define DEBUG_MOUSE 0
+#define DEBUG_MOUSE_MOTION 0
+
 #define DRAW_EACH_ACTION 0
 
 #define _XOPEN_SOURCE 
@@ -126,6 +129,9 @@ static guint terminal_widget_signals[LAST_SIGNAL] = { 0 };
 static gboolean terminal_widget_configure(GtkWidget * widget, GdkEventConfigure * event);
 static gboolean terminal_widget_expose(GtkWidget * widget, GdkEventExpose * event);
 static gboolean terminal_widget_key_press(GtkWidget * widget, GdkEventKey * event);
+static gboolean terminal_widget_button_press(GtkWidget * widget, GdkEventButton * event);
+static gboolean terminal_widget_button_release(GtkWidget * widget, GdkEventButton * event);
+static gboolean terminal_widget_motion_notify(GtkWidget * widget, GdkEventMotion * event);
 void terminal_widget_adjust_to_size(TerminalWidget * terminal_widget, int w, int h, gboolean force);
 
 void terminal_widget_handle_ascii(TerminalHandler * terminal_handler, char c);
@@ -165,6 +171,9 @@ static void terminal_widget_class_init(TerminalWidgetClass *class)
 	widget_class -> configure_event = terminal_widget_configure;
 	widget_class -> expose_event = terminal_widget_expose;
 	widget_class -> key_press_event = terminal_widget_key_press;
+	widget_class -> button_press_event = terminal_widget_button_press;
+	widget_class -> button_release_event = terminal_widget_button_release;
+	widget_class -> motion_notify_event = terminal_widget_motion_notify;
 
         terminal_widget_signals[SET_SCREEN] = g_signal_new(
                 "set-screen",
@@ -244,31 +253,35 @@ GArray * row_buffer_create(TerminalWidget * terminal_widget)
 	GArray * buffer = g_array_new(FALSE, FALSE, sizeof(GArray*));
 	int r, c;
 	return buffer;
-	// this is obsolete due to automatic adding of lines TODO: remove
-	for (r = 0; r < terminal_widget -> n_rows; r++){
-		GArray * row = g_array_new(FALSE, FALSE, sizeof(Pixel)); // LC
-		//printf("rows1 %d\n", rcc++);
-		g_array_append_val(buffer, row);
-		for (c = 0; c < terminal_widget -> n_cols; c++){
-			Pixel pixel;
-			pixel_init(terminal_widget, &pixel, (gunichar)' ');
-			g_array_append_val(row, pixel);
-		}
-	}
-	return buffer;
+//	// this is obsolete due to automatic adding of lines TODO: remove
+//	for (r = 0; r < terminal_widget -> n_rows; r++){
+//		GArray * row = g_array_new(FALSE, FALSE, sizeof(Pixel)); // LC
+//		//printf("rows1 %d\n", rcc++);
+//		g_array_append_val(buffer, row);
+//		for (c = 0; c < terminal_widget -> n_cols; c++){
+//			Pixel pixel;
+//			pixel_init(terminal_widget, &pixel, (gunichar)' ');
+//			g_array_append_val(row, pixel);
+//		}
+//	}
+//	return buffer;
 }
 
 GArray * row_copy(GArray * row)
 {
 	int l = row -> len;
 	GArray * array = g_array_sized_new(FALSE, FALSE, sizeof(Pixel), l);
-	int i;
-	for (i = 0; i < l; i++){
-		Pixel * pixel = &g_array_index(row, Pixel, i);
-		Pixel p;
-		memcpy(&p, pixel, sizeof(Pixel));
-		g_array_append_val(array, p);
-	}
+	// shoule be a bit faster like this
+	memcpy(array -> data, row -> data, sizeof(Pixel) * l);
+	array -> len = l;
+	// slower version
+//	int i;
+//	for (i = 0; i < l; i++){
+//		Pixel * pixel = &g_array_index(row, Pixel, i);
+//		Pixel p;
+//		memcpy(&p, pixel, sizeof(Pixel));
+//		g_array_append_val(array, p);
+//	}
 	return array;
 }
 
@@ -318,6 +331,8 @@ void terminal_widget_config_changed_cb(TerminalConfig * terminal_config, Termina
 static void terminal_widget_init(TerminalWidget *terminal_widget)
 {
         GTK_OBJECT_SET_FLAGS(terminal_widget, GTK_CAN_FOCUS);
+	gtk_widget_set_events(GTK_WIDGET(terminal_widget), gtk_widget_get_events(GTK_WIDGET(terminal_widget))
+		| GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_POINTER_MOTION_MASK);
 
 	terminal_widget -> width = 200;
 	terminal_widget -> height = 100;
@@ -336,6 +351,8 @@ static void terminal_widget_init(TerminalWidget *terminal_widget)
 	terminal_widget -> show_scrolling_region = TRUE;
 
 	terminal_widget -> ascent = -1;
+
+	terminal_widget -> mouse_left_pressed = FALSE;
 }
 
 void terminal_widget_constructor(TerminalWidget * terminal_widget)
@@ -659,6 +676,57 @@ void send_keypad(TerminalWidget * terminal_widget, int key) // xterm doc
 	char * wbuf = g_strdup_printf("\033[%c~", letter); 
 	write(terminal_widget -> master, wbuf, 4);
 	free(wbuf);
+}
+
+/****************************************************************
+Mouse Handling
+****************************************************************/
+
+void terminal_widget_get_position(TerminalWidget * terminal_widget, double wx, double wy, int * x, int * y)
+{
+	*x = (int) (wx / terminal_widget -> c_w);
+	*y = (int) (wy / terminal_widget -> c_h);
+}
+
+static gboolean terminal_widget_button_press(GtkWidget * widget, GdkEventButton * event)
+{
+	TerminalWidget * terminal_widget = (TerminalWidget*) widget;
+	int x, y;
+	terminal_widget_get_position(terminal_widget, event -> x, event -> y, &x, &y);
+	if (event -> button == 1){
+		terminal_widget -> mouse_left_pressed = TRUE;
+		#if DEBUG_MOUSE
+		printf("press %d %d\n", x, y);
+		#endif
+	}
+	return FALSE;
+}
+
+static gboolean terminal_widget_button_release(GtkWidget * widget, GdkEventButton * event)
+{
+	TerminalWidget * terminal_widget = (TerminalWidget*) widget;
+	int x, y;
+	terminal_widget_get_position(terminal_widget, event -> x, event -> y, &x, &y);
+	if (event -> button == 1){
+		terminal_widget -> mouse_left_pressed = FALSE;
+		#if DEBUG_MOUSE
+		printf("release %d %d\n", x, y);
+		#endif
+	}
+	return FALSE;
+}
+
+static gboolean terminal_widget_motion_notify(GtkWidget * widget, GdkEventMotion * event)
+{
+	TerminalWidget * terminal_widget = (TerminalWidget*) widget;
+	if (terminal_widget -> mouse_left_pressed){
+		int x, y;
+		terminal_widget_get_position(terminal_widget, event -> x, event -> y, &x, &y);
+		#if DEBUG_MOUSE_MOTION
+		printf("motion %d %d\n", x, y);
+		#endif
+	}
+	return FALSE;
 }
 
 /****************************************************************

@@ -131,6 +131,8 @@ struct _TerminalWidget
 
 	History * history;
 	int history_pos;
+
+	gboolean mouse_left_pressed;
 };
 
 struct _TerminalWidgetClass
