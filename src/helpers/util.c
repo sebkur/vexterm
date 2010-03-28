@@ -218,11 +218,11 @@ int remove_file(char * filename)
 GSequenceIter * g_sequence_find(GSequence * sequence, gpointer data, GCompareDataFunc cmp_func, gpointer cmp_data)
 {
 	GSequenceIter * iter = g_sequence_search(sequence, data, cmp_func, cmp_data);
-	if (!g_sequence_iter_is_end(iter)){
-		gpointer fdata = g_sequence_get(iter);
-		if (cmp_func(data, fdata, cmp_data) == 0) return iter;
+	GSequenceIter * iter2 = g_sequence_iter_prev(iter);
+	if (!g_sequence_iter_is_end(iter2)){
+		gpointer fdata = g_sequence_get(iter2);
+		if (cmp_func(data, fdata, cmp_data) == 0) return iter2;
 	}
-	iter = g_sequence_iter_prev(iter);
 	if (!g_sequence_iter_is_end(iter)){
 		gpointer fdata = g_sequence_get(iter);
 		if (cmp_func(data, fdata, cmp_data) == 0) return iter;

@@ -73,6 +73,12 @@ static void vex_single_init(VexSingle *vex_single)
 {
 }
 
+void vex_single_focus(GtkWidget * terminal_widget, VexSingle * vex_single)
+{
+	gboolean ret;
+	g_signal_emit_by_name(G_OBJECT(vex_single), "focus-in-event", NULL, &ret);
+}
+
 void vex_single_set_profile(VexSingle * vex_single, VexProfile * profile)
 {
 	printf("VEX_SINGLE: set_profile\n");
@@ -153,6 +159,10 @@ void vex_single_constructor(VexSingle * vex_single, char * pwd, VexProfile * pro
 
 //	gtk_box_pack_start(GTK_BOX(vex_single), GTK_WIDGET(dc), FALSE, FALSE, 0);
 	gtk_box_pack_start(GTK_BOX(vex_single), GTK_WIDGET(vex_single -> terminal_widget), TRUE, TRUE, 0);
+
+	g_signal_connect(
+		G_OBJECT(vex_single -> terminal_widget), "grab-focus",
+		G_CALLBACK(vex_single_focus), vex_single);
 }
 
 void vex_single_terminal_config_setup_with_profile(VexSingle * vex_single, TerminalConfig * tc, VexProfile * profile)

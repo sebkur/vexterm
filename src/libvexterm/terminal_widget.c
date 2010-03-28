@@ -711,6 +711,9 @@ void terminal_widget_get_position(TerminalWidget * terminal_widget, double wx, d
 
 static gboolean terminal_widget_button_press(GtkWidget * widget, GdkEventButton * event)
 {
+	if (!GTK_WIDGET_HAS_FOCUS(widget)){
+		gtk_widget_grab_focus(widget);
+	}
 	TerminalWidget * terminal_widget = (TerminalWidget*) widget;
 	terminal_widget -> mouse_press_x = (int) event -> x;
 	terminal_widget -> mouse_press_y = (int) event -> y;

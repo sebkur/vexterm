@@ -635,16 +635,16 @@ void pty_thread_func(Terminal * terminal)
 		c = read(mfd, &buf[PREBUFFER], BUFSIZE - 1);
 		if (c <= 0) break;
 		fflush(NULL);
-		struct timeval t1, t2;
+		//struct timeval t1, t2;
 
 		#if DEBUG_TOFILE
 		write(terminal -> debug, buf, c);
 		#endif
 		class -> chunk_begin(terminal -> handler);
 
-		gettimeofday(&t1, NULL);
+		//gettimeofday(&t1, NULL);
 		parse(terminal, buf, c);
-		gettimeofday(&t2, NULL);
+		//gettimeofday(&t2, NULL);
 		//printf("PARSE TIME: %d\n", time_diff(&t1, &t2));
 		#if DEBUG_UTF8 && DEBUG_TOFILE
 		//char * msg = ">>END_OF_MSG<<";
