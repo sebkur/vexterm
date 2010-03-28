@@ -2,6 +2,7 @@ BIN = splittable
 
 SRC = \
 gtk_splittable.c \
+splittable_collection.c \
 ../../libvexterm/csi.c \
 ../../libvexterm/debugger_control.c \
 ../../libvexterm/history.c \
@@ -26,6 +27,7 @@ gtk_splittable.c \
 ../../vexterm/about/about_widget.c \
 ../../vexterm/about/about_logo.c \
 ../../vexterm/about/srt_parser.c \
+../../helpers/g_map/g_map.c \
 ../../helpers/process.c \
 ../../helpers/tool.c \
 ../../helpers/util.c \
@@ -35,6 +37,7 @@ main.c
 
 OBJ = \
 gtk_splittable.o \
+splittable_collection.o \
 ../../libvexterm/csi.o \
 ../../libvexterm/debugger_control.o \
 ../../libvexterm/history.o \
@@ -59,6 +62,7 @@ gtk_splittable.o \
 ../../vexterm/about/about_widget.o \
 ../../vexterm/about/about_logo.o \
 ../../vexterm/about/srt_parser.o \
+../../helpers/g_map/g_map.o \
 ../../helpers/process.o \
 ../../helpers/tool.o \
 ../../helpers/util.o \

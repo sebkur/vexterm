@@ -30,26 +30,51 @@
 
 G_DEFINE_TYPE (GtkSplittable, gtk_splittable, GTK_TYPE_VBOX);
 
-/*enum
+enum
 {
-        SIGNAL_NAME_1,
-        SIGNAL_NAME_n,
+        ADD,
+        REMOVE,
+	SPLIT,
+	UNSPLIT,
         LAST_SIGNAL
-};*/
+};
 
-//static guint gtk_splittable_signals[LAST_SIGNAL] = { 0 };
-//g_signal_emit (widget, gtk_splittable_signals[SIGNAL_NAME_n], 0);
+static guint gtk_splittable_signals[LAST_SIGNAL] = { 0 };
 
 static void gtk_splittable_class_init(GtkSplittableClass *class)
 {
-        /*gtk_splittable_signals[SIGNAL_NAME_n] = g_signal_new(
-                "signal-name-n",
+        gtk_splittable_signals[ADD] = g_signal_new(
+                "child-add",
                 G_OBJECT_CLASS_TYPE (class),
                 G_SIGNAL_RUN_FIRST,
-                G_STRUCT_OFFSET (GtkSplittableClass, function_name),
+                G_STRUCT_OFFSET (GtkSplittableClass, add),
+                NULL, NULL,
+                g_cclosure_marshal_VOID__POINTER,
+                G_TYPE_NONE, 1, G_TYPE_POINTER);
+        gtk_splittable_signals[REMOVE] = g_signal_new(
+                "child-remove",
+                G_OBJECT_CLASS_TYPE (class),
+                G_SIGNAL_RUN_FIRST,
+                G_STRUCT_OFFSET (GtkSplittableClass, remove),
+                NULL, NULL,
+                g_cclosure_marshal_VOID__POINTER,
+                G_TYPE_NONE, 1, G_TYPE_POINTER);
+        gtk_splittable_signals[SPLIT] = g_signal_new(
+                "split",
+                G_OBJECT_CLASS_TYPE (class),
+                G_SIGNAL_RUN_FIRST,
+                G_STRUCT_OFFSET (GtkSplittableClass, split),
                 NULL, NULL,
                 g_cclosure_marshal_VOID__VOID,
-                G_TYPE_NONE, 0);*/
+                G_TYPE_NONE, 0);
+        gtk_splittable_signals[UNSPLIT] = g_signal_new(
+                "unsplit",
+                G_OBJECT_CLASS_TYPE (class),
+                G_SIGNAL_RUN_FIRST,
+                G_STRUCT_OFFSET (GtkSplittableClass, unsplit),
+                NULL, NULL,
+                g_cclosure_marshal_VOID__VOID,
+                G_TYPE_NONE, 0);
 }
 
 static void gtk_splittable_init(GtkSplittable *gtk_splittable)
@@ -58,7 +83,7 @@ static void gtk_splittable_init(GtkSplittable *gtk_splittable)
 
 void gtk_splittable_paned_position_cb(GtkPaned * paned, GParamSpec * pspec, GtkSplittable * splittable);
 void gtk_splittable_paned_size_cb(GtkPaned * paned, GtkAllocation * allocation, GtkSplittable * splittable);
-void gtk_splittable_child_focus_in_cb(GtkWidget * child, GdkEventFocus * event, GtkSplittable * splittable);
+gboolean gtk_splittable_child_focus_in_cb(GtkWidget * child, GdkEventFocus * event, GtkSplittable * splittable);
 void gtk_splittable_child_connect_focus_handler(GtkWidget * child, GtkSplittable * splittable);
 
 GtkWidget * gtk_splittable_new()
@@ -111,6 +136,7 @@ void gtk_splittable_split(GtkSplittable * splittable, GtkWidget * child, GtkSpli
 	GtkWidget * paned = splittable -> split_mode == GTK_SPLITTED_HORIZONTALLY
 		? gtk_hpaned_new() : gtk_vpaned_new();
 	gtk_container_add(GTK_CONTAINER(splittable), paned);
+	g_signal_emit (splittable, gtk_splittable_signals[ADD], 0, child);
 
 	GtkWidget * splittable1 = VEX_IS_GTK_SPLITTABLE(child) ? child : gtk_splittable_new_with_child(child);
 	GtkWidget * splittable2 = VEX_IS_GTK_SPLITTABLE(old_child) ? old_child : gtk_splittable_new_with_child(old_child);
@@ -142,6 +168,7 @@ void gtk_splittable_split(GtkSplittable * splittable, GtkWidget * child, GtkSpli
 	if (VEX_IS_GTK_SPLITTABLE(child)){
 		printf("splittable splitted with splittable\n");
 	}
+	gtk_widget_show_all(paned);
 }
 
 void gtk_splittable_unsplit_by_position(GtkSplittable * splittable, GtkSplitPosition position)
@@ -152,6 +179,11 @@ void gtk_splittable_unsplit_by_child(GtkSplittable * splittable, GtkWidget * chi
 {
 }
 
+
+gboolean gtk_splittable_is_empty(GtkSplittable * splittable)
+{
+	return splittable -> child1 == NULL;
+}
 
 gboolean gtk_splittable_is_splitted(GtkSplittable * splittable)
 {
@@ -179,7 +211,10 @@ void gtk_splittable_set_child(GtkSplittable * splittable, GtkWidget * child)
 		// this should not happen
 		return;
 	}
-	// set
+	splittable -> child1 = child;
+	g_signal_emit (splittable, gtk_splittable_signals[ADD], 0, child);
+	gtk_container_add(GTK_CONTAINER(splittable), child);
+	gtk_splittable_child_connect_focus_handler(child, splittable);
 }
 
 
@@ -243,9 +278,10 @@ void gtk_splittable_paned_size_cb(GtkPaned * paned, GtkAllocation * allocation, 
 	}
 }
 
-void gtk_splittable_child_focus_in_cb(GtkWidget * child, GdkEventFocus * event, GtkSplittable * splittable)
+gboolean gtk_splittable_child_focus_in_cb(GtkWidget * child, GdkEventFocus * event, GtkSplittable * splittable)
 {
-	printf("focused %p %p\n", child, splittable);
+	//printf("focused %p %p\n", child, splittable);
+	return FALSE;
 }
 
 void gtk_splittable_child_connect_focus_handler(GtkWidget * child, GtkSplittable * splittable)

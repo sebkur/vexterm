@@ -74,8 +74,10 @@ struct _GtkSplittableClass
 {
 	GtkBinClass parent_class;
 
-	void (* split) (GtkSplittable *gtk_splittable);
-	void (* unsplit) (GtkSplittable *gtk_splittable);
+	void (* add) (GtkSplittable * gtk_splittable, GtkWidget * child);
+	void (* remove) (GtkSplittable * gtk_splittable, GtkWidget * child);
+	void (* split) (GtkSplittable * gtk_splittable);
+	void (* unsplit) (GtkSplittable * gtk_splittable);
 };
 
 GtkWidget * gtk_splittable_new();
@@ -85,6 +87,7 @@ void gtk_splittable_split(GtkSplittable * splittable, GtkWidget * child, GtkSpli
 void gtk_splittable_unsplit_by_position(GtkSplittable * splittable, GtkSplitPosition position);
 void gtk_splittable_unsplit_by_child(GtkSplittable * splittable, GtkWidget * child);
 
+gboolean gtk_splittable_is_empty(GtkSplittable * splittable);
 gboolean gtk_splittable_is_splitted(GtkSplittable * splittable);
 GtkSplitMode gtk_splittable_get_split_mode(GtkSplittable * splittable);
 
