@@ -28,6 +28,7 @@
 
 #include "splittable_collection.h"
 #include "../../helpers/tool.h"
+#include "../../helpers/util.h"
 
 G_DEFINE_TYPE (SplittableCollection, splittable_collection, GTK_TYPE_VBOX);
 
@@ -69,7 +70,7 @@ GtkWidget * splittable_collection_new()
 	SplittableCollection * sc = g_object_new(VEX_TYPE_SPLITTABLE_COLLECTION, NULL);
 
 	sc -> descendents_to_splittables = g_map_new(compare_pointers, NULL);
-
+	sc -> splittables = g_sequence_new(NULL);
 	sc -> focussed_descendent = NULL;
 
 	return GTK_WIDGET(sc);
@@ -97,9 +98,13 @@ GtkSplittable * splittable_collection_get_active_splittable(SplittableCollection
 
 void splittable_collection_splittable_connect_child_added_handler(SplittableCollection * sc, GtkSplittable * splittable)
 {
-	g_signal_connect(
-		G_OBJECT(splittable), "child-add",
-		G_CALLBACK(splittable_collection_splittable_child_add_cb), sc);
+	GSequenceIter * i = g_sequence_find(sc -> splittables, splittable, compare_pointers, NULL);
+	if (i == NULL){
+		g_sequence_insert_sorted(sc -> splittables, splittable, compare_pointers, NULL);
+		g_signal_connect(
+			G_OBJECT(splittable), "child-add",
+			G_CALLBACK(splittable_collection_splittable_child_add_cb), sc);
+	}
 }
 
 void splittable_collection_child_connect_focus_handler(SplittableCollection * sc, GtkWidget * child)

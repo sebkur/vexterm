@@ -36,6 +36,8 @@
 #include "gtk_splittable.h"
 #include "splittable_collection.h"
 #include "../../vexterm/vex_single.h"
+#include "../../helpers/tool.h"
+#include "../../helpers/util.h"
 
 char * executable;
 

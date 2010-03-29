@@ -52,6 +52,7 @@ struct _SplittableCollection
 	GtkWidget * focussed_descendent;
 
 	GMap * descendents_to_splittables;
+	GSequence * splittables;
 };
 
 struct _SplittableCollectionClass

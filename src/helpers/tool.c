@@ -40,6 +40,7 @@ int time_diff(struct timeval * t1, struct timeval * t2)
 
 GtkWidget * find_containing_gtk_window(GtkWidget * widget)
 {
+	if (GTK_IS_WINDOW(widget)) return widget;
 	GtkWidget * current = widget;
 	GtkWidget * cparent = gtk_widget_get_parent(current);
 	while(cparent != NULL && !GTK_IS_WINDOW(cparent)){
