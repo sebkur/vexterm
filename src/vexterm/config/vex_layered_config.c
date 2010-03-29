@@ -184,6 +184,11 @@ gboolean vex_layered_config_get_show_status_bar(VexLayeredConfig * vex_layered_c
 	return FALSE;
 }
 
+GtkPositionType vex_layered_config_get_tabs_position(VexLayeredConfig * vex_layered_config)
+{
+	return GTK_POS_TOP;
+}
+
 char * vex_layered_config_get_active_profile(VexLayeredConfig * vex_layered_config)
 {
 	return NULL;

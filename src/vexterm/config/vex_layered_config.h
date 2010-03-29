@@ -82,6 +82,7 @@ VexConfig * vex_layered_config_get_config_local(VexLayeredConfig * vex_layered_c
 
 gboolean vex_layered_config_get_show_scrolling_region(VexLayeredConfig * vex_layered_config);
 gboolean vex_layered_config_get_show_status_bar(VexLayeredConfig * vex_layered_config);
+GtkPositionType vex_layered_config_get_tabs_position(VexLayeredConfig * vex_layered_config);
 char * vex_layered_config_get_active_profile(VexLayeredConfig * vex_layered_config);
 
 int vex_layered_config_get_number_of_profiles(VexLayeredConfig * vex_layered_config);

@@ -20,7 +20,7 @@
 
 #define DEBUG_MAIN 0
 #define DEBUG_XML 0
-#define DEBUG_ITEMS 0
+#define DEBUG_ITEMS 1
 #define DEBUG_COLOURS 0
 
 #include <errno.h>
@@ -75,11 +75,12 @@ typedef enum{
 	TAG_UNKNOWN,
 	TAG_CONFIGURATION,
 	  TAG_PREFERENCES,
+	    TAG_DEBUG,
+	    TAG_TABS,
 	  TAG_PROFILES,
 	    TAG_PROFILE,
 	      TAG_FONT,
 	      TAG_COLOURS,
-	      TAG_DEBUG,
 	  TAG_COLOUR_SCHEMES,
 	    TAG_COLOUR_SCHEME,
 	      TAG_COLOUR
@@ -138,6 +139,7 @@ void vex_config_reader_handle_profile(VexConfigReader * vcr, const XML_Char ** a
 void vex_config_reader_handle_font(VexConfigReader * vcr, const XML_Char ** atts);
 void vex_config_reader_handle_colours(VexConfigReader * vcr, const XML_Char ** atts);
 void vex_config_reader_handle_debug(VexConfigReader * vcr, const XML_Char ** atts);
+void vex_config_reader_handle_tabs(VexConfigReader * vcr, const XML_Char ** atts);
 void vex_config_reader_handle_colour_scheme(VexConfigReader * vcr, const XML_Char ** atts);
 void vex_config_reader_handle_colour(VexConfigReader * vcr, const XML_Char ** atts);
 void vex_config_reader_handle_profile_end(VexConfigReader * vcr);
@@ -158,6 +160,8 @@ static void XMLCALL vex_config_reader_StartElementCallback(
 		case TAG_NONE:{
 			if (TAG_IS("configuration")){
 				vex_config_reader_nesting_push(vcr, TAG_CONFIGURATION);
+			}else{
+				vex_config_reader_nesting_push(vcr, TAG_UNKNOWN);
 			}
 			break;
 		}
@@ -169,6 +173,8 @@ static void XMLCALL vex_config_reader_StartElementCallback(
 				vex_config_reader_nesting_push(vcr, TAG_PROFILES);
 			}else if(TAG_IS("colourschemes")){
 				vex_config_reader_nesting_push(vcr, TAG_COLOUR_SCHEMES);
+			}else{
+				vex_config_reader_nesting_push(vcr, TAG_UNKNOWN);
 			}
 			break;
 		}
@@ -176,12 +182,20 @@ static void XMLCALL vex_config_reader_StartElementCallback(
 			if(TAG_IS("debug")){
 				vex_config_reader_nesting_push(vcr, TAG_DEBUG);
 				vex_config_reader_handle_debug(vcr, atts);
+			}else if(TAG_IS("tabs")){
+				vex_config_reader_nesting_push(vcr, TAG_TABS);
+				vex_config_reader_handle_tabs(vcr, atts);
+			}else{
+				vex_config_reader_nesting_push(vcr, TAG_UNKNOWN);
 			}
+			break;
 		}
 		case TAG_PROFILES:{
 			if (TAG_IS("profile")){
 				vex_config_reader_nesting_push(vcr, TAG_PROFILE);
 				vex_config_reader_handle_profile(vcr, atts);
+			}else{
+				vex_config_reader_nesting_push(vcr, TAG_UNKNOWN);
 			}
 			break;
 		}
@@ -192,6 +206,8 @@ static void XMLCALL vex_config_reader_StartElementCallback(
 			}else if(TAG_IS("colours")){
 				vex_config_reader_nesting_push(vcr, TAG_COLOURS);
 				vex_config_reader_handle_colours(vcr, atts);
+			}else{
+				vex_config_reader_nesting_push(vcr, TAG_UNKNOWN);
 			}
 			break;
 		}
@@ -199,6 +215,8 @@ static void XMLCALL vex_config_reader_StartElementCallback(
 			if (TAG_IS("colourscheme")){
 				vex_config_reader_nesting_push(vcr, TAG_COLOUR_SCHEME);
 				vex_config_reader_handle_colour_scheme(vcr, atts);
+			}else{
+				vex_config_reader_nesting_push(vcr, TAG_UNKNOWN);
 			}
 			break;
 		}
@@ -206,6 +224,8 @@ static void XMLCALL vex_config_reader_StartElementCallback(
 			if (TAG_IS("colour")){
 				vex_config_reader_nesting_push(vcr, TAG_COLOUR);
 				vex_config_reader_handle_colour(vcr, atts);
+			}else{
+				vex_config_reader_nesting_push(vcr, TAG_UNKNOWN);
 			}
 			break;
 		}
@@ -372,6 +392,26 @@ void vex_config_reader_handle_debug(VexConfigReader * vcr, const XML_Char ** att
 		printf("SET STATUS BAR: %d\n", show);
 		#endif
 		vex_config_set_show_status_bar(vcr -> vex_config, show);
+	}
+}
+
+void vex_config_reader_handle_tabs(VexConfigReader * vcr, const XML_Char ** atts)
+{
+	const char * position = vex_config_reader_get_value(atts, "position");
+	if (position != NULL){
+		int pos = -1;
+		if (strcmp(position, "top") == 0){
+			pos = GTK_POS_TOP;
+		}else if(strcmp(position, "bottom") == 0){
+			pos = GTK_POS_BOTTOM;
+		}else if(strcmp(position, "left") == 0){
+			pos = GTK_POS_LEFT;
+		}else if(strcmp(position, "right") == 0){
+			pos = GTK_POS_RIGHT;
+		}
+		if (pos != -1){
+			vex_config_set_tabs_position(vcr -> vex_config, pos);
+		}
 	}
 }
 

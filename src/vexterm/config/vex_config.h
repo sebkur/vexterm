@@ -53,6 +53,7 @@ struct _VexConfig
 
 	gboolean	show_scrolling_region;
 	gboolean	show_status_bar;
+	GtkPositionType tabs_position;
 
 	char * 		active_profile;
 	GSequence *	profiles;
@@ -81,6 +82,7 @@ void vex_config_deepcopy(VexConfig * config_from, VexConfig * config_to);
 /* SETTERS / ADDERS / REMOVERS */
 void vex_config_set_show_scrolling_region(VexConfig * vex_config, gboolean show);
 void vex_config_set_show_status_bar(VexConfig * vex_config, gboolean show);
+void vex_config_set_tabs_position(VexConfig * vex_config, GtkPositionType position);
 void vex_config_set_active_profile(VexConfig * vex_config, char * name);
 void vex_config_add_profile(VexConfig * vex_config, const char * name, VexProfile * profile);
 void vex_config_add_profile_defaults(VexConfig * vex_config, const char * name);
@@ -94,6 +96,7 @@ void vex_config_rename_colour_scheme(VexConfig * vex_config, const char * name, 
 /* GETTERS */
 gboolean vex_config_get_show_scrolling_region(VexConfig * vex_config);
 gboolean vex_config_get_show_status_bar(VexConfig * vex_config);
+GtkPositionType vex_config_get_tabs_position(VexConfig * vex_config);
 char * vex_config_get_active_profile(VexConfig * vex_config);
 
 int vex_config_get_number_of_profiles(VexConfig * vex_config);

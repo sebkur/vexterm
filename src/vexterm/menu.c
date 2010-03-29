@@ -53,6 +53,7 @@ GtkWidget * menu_new()
 	GtkWidget *item_2                      = gtk_menu_item_new_with_mnemonic("_View");
 	GtkWidget *menu_2                      = gtk_menu_new();
 	GtkWidget *item_2_1                    = gtk_check_menu_item_new_with_mnemonic("_Fullscreen");
+	GtkWidget *item_2_2                    = gtk_menu_item_new_with_mnemonic("_Tabs Position");
 	GtkWidget *item_3                      = gtk_menu_item_new_with_mnemonic("_Options");
 	GtkWidget *menu_3                      = gtk_menu_new();
 	GtkWidget *item_3_1                    = gtk_menu_item_new_with_mnemonic("_Preferences");
@@ -77,6 +78,7 @@ GtkWidget * menu_new()
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu_1),             item_1_3);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menubar),            item_2);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu_2),             item_2_1);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu_2),             item_2_2);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menubar),            item_3);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu_3),             item_3_1);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menubar),            item_4);
@@ -91,6 +93,7 @@ GtkWidget * menu_new()
 	menubar -> menu_file_new_tab              = item_1_2;
 	menubar -> menu_file_quit                 = item_1_3;
 	menubar -> menu_view_fullscreen           = item_2_1;
+	menubar -> menu_view_tabs_position        = item_2_2;
 	menubar -> menu_options_preferences       = item_3_1;
 	menubar -> menu_profiles                  = item_4;
 	menubar -> menu_show_scrolling_region     = item_5_1;

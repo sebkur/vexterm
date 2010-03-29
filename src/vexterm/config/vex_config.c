@@ -139,6 +139,11 @@ static void vex_config_class_init(VexConfigClass *class)
 
 static void vex_config_init(VexConfig *vex_config)
 {
+	/* default values here */
+	vex_config -> show_scrolling_region = FALSE;
+	vex_config -> show_status_bar = FALSE;
+	vex_config -> tabs_position = GTK_POS_TOP;
+
 	vex_config -> active_profile = NULL;
 	vex_config -> profiles = g_sequence_new(free_profile_entry);
 	vex_config -> colour_schemes = g_sequence_new(free_colour_scheme_entry);
@@ -148,6 +153,7 @@ void vex_config_deepcopy(VexConfig * config_from, VexConfig * config_to)
 {
 	vex_config_set_show_scrolling_region(config_to, vex_config_get_show_scrolling_region(config_from));
 	vex_config_set_show_status_bar(config_to, vex_config_get_show_status_bar(config_from));
+	vex_config_set_tabs_position(config_to, vex_config_get_tabs_position(config_from));
 	if (vex_config_get_active_profile(config_from) != NULL){
 		vex_config_set_active_profile(config_to, vex_config_get_active_profile(config_from));
 	}
@@ -174,6 +180,11 @@ void vex_config_set_show_scrolling_region(VexConfig * vex_config, gboolean show)
 void vex_config_set_show_status_bar(VexConfig * vex_config, gboolean show)
 {
 	vex_config -> show_status_bar = show;
+}
+
+void vex_config_set_tabs_position(VexConfig * vex_config, GtkPositionType position)
+{
+	vex_config -> tabs_position = position;
 }
 
 void vex_config_set_active_profile(VexConfig * vex_config, char * name)
@@ -273,6 +284,11 @@ gboolean vex_config_get_show_scrolling_region(VexConfig * vex_config)
 gboolean vex_config_get_show_status_bar(VexConfig * vex_config)
 {
 	return vex_config -> show_status_bar;
+}
+
+GtkPositionType vex_config_get_tabs_position(VexConfig * vex_config)
+{
+	return vex_config -> tabs_position;
 }
 
 char * vex_config_get_active_profile(VexConfig * vex_config)

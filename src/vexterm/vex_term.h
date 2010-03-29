@@ -58,6 +58,7 @@ struct _VexTerm
 	gboolean menu_visible;
 	gboolean show_status_bar;
 	gboolean show_scrolling_region;
+	GtkPositionType tabs_position;
 
 	GtkWidget * preferences;
 	VexLayeredConfig * vlc_copy;

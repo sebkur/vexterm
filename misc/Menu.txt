@@ -4,6 +4,7 @@ _File;
  _Quit;			menu_file_quit
 _View;
  _Fullscreen;		menu_view_fullscreen;		check
+ _Tabs Position;	menu_view_tabs_position
 _Options;
  _Preferences;		menu_options_preferences
 _Profile;		menu_profiles

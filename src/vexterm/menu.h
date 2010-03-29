@@ -55,6 +55,7 @@ struct _Menu
 	GtkWidget * menu_file_new_tab;
 	GtkWidget * menu_file_quit;
 	GtkWidget * menu_view_fullscreen;
+	GtkWidget * menu_view_tabs_position;
 	GtkWidget * menu_options_preferences;
 	GtkWidget * menu_profiles;
 	GtkWidget * menu_show_scrolling_region;

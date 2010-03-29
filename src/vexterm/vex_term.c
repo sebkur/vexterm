@@ -79,6 +79,7 @@ static gboolean show_about_license_cb(GtkWidget *widget, VexTerm * vex_term);
 static gboolean show_preferences_cb(GtkWidget *widget, VexTerm * vex_term);
 static gboolean menubar_new_window_cb(GtkWidget *widget, VexTerm * vex_term);
 static gboolean menubar_new_tab_cb(GtkWidget *widget, VexTerm * vex_term);
+static void menubar_position_radio_toggled_cb(GtkCheckMenuItem * item, VexTerm * vex_term);
 
 void vex_term_add_profile_entry(VexTerm * vex_term, char * name);
 void vex_term_remove_profile_entry(VexTerm * vex_term, char * name);
@@ -86,6 +87,7 @@ void vex_term_rename_profile_entry(VexTerm * vex_term, char * name, char * new_n
 
 void vex_term_toggle_fullscreen(VexTerm * vex_term);
 void vex_term_toggle_menu(VexTerm * vex_term);
+void vex_term_set_notebook_tabs_position(VexTerm * vex_term, GtkPositionType pos);
 
 GtkWidget * vex_term_new(VexLayeredConfig * vlc)
 {
@@ -121,11 +123,14 @@ void vex_term_constructor(VexTerm * vex_term, VexLayeredConfig * vlc)
 	vex_term -> menu_visible = TRUE;
 	vex_term -> show_status_bar = vex_config_get_show_status_bar(vex_layered_config_get_config_local(vlc));
 	vex_term -> show_scrolling_region = vex_config_get_show_scrolling_region(vex_layered_config_get_config_local(vlc));
+	vex_term -> tabs_position = vex_config_get_tabs_position(vex_layered_config_get_config_local(vlc));
 	vex_term -> preferences = NULL;
 
 	g_object_set(vex_term -> notebook, "tab-border", 0, NULL);
 	g_object_set(vex_term -> notebook, "tab-vborder", 0, NULL);
 	gtk_notebook_set_scrollable(GTK_NOTEBOOK(vex_term -> notebook), TRUE);
+	gtk_notebook_set_tab_pos(GTK_NOTEBOOK(vex_term -> notebook), vex_term -> tabs_position);
+
 	// TODO: wait for a version of gtk that supports this
 //	GtkWidget * button_tab = gtk_button_new_with_label("ct");
 //	gtk_notebook_set_action_widget(GTK_NOTEBOOK(vex_term -> notebook),
@@ -146,6 +151,32 @@ void vex_term_constructor(VexTerm * vex_term, VexLayeredConfig * vlc)
 	g_signal_connect(
 		G_OBJECT(vex_term -> notebook), "switch-page",
 		G_CALLBACK(vex_term_notebook_switch_page_cb), vex_term);
+	
+	/* append tabs-position items to the menu */
+	GtkWidget * menu_tabs_position = gtk_menu_new();
+	gtk_menu_item_set_submenu(GTK_MENU_ITEM(vex_term -> menu -> menu_view_tabs_position), menu_tabs_position);
+	GSList * tabs_items_group = NULL;
+
+	char * tab_items_names[] = {"_Left", "_Right", "_Top", "_Bottom"};
+	GtkPositionType tab_items_values[] = {GTK_POS_LEFT, GTK_POS_RIGHT, GTK_POS_TOP, GTK_POS_BOTTOM};
+	GtkWidget * tab_items[4];
+	int i, tab_items_active;
+	for (i = 0; i < 4; i++){
+		GtkWidget * item = gtk_radio_menu_item_new_with_mnemonic(tabs_items_group, tab_items_names[i]);
+		tab_items[i] = item;
+		tabs_items_group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(item));
+		gtk_menu_shell_append(GTK_MENU_SHELL(menu_tabs_position), item);
+		g_object_set(G_OBJECT(item), "user-data", GINT_TO_POINTER(tab_items_values[i]), NULL);
+		if (tab_items_values[i] == vex_term -> tabs_position){
+			tab_items_active = i;
+		}
+	}
+	gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(tab_items[tab_items_active]), TRUE);
+	for (i = 0; i < 4; i++){
+		g_signal_connect(
+			G_OBJECT(tab_items[i]), "toggled",
+			G_CALLBACK(menubar_position_radio_toggled_cb), vex_term);
+	}
 
 	/* set menu item status according to config */
 	gtk_check_menu_item_set_active(
@@ -247,8 +278,10 @@ void vex_term_add_tab(VexTerm * vex_term)
 	gtk_widget_show_all(label);
 
 	int p = gtk_notebook_append_page(nb, GTK_WIDGET(vcs), label);
+	GtkPositionType tab_pos = gtk_notebook_get_tab_pos(nb);
+	gboolean tab_expand = tab_pos == GTK_POS_TOP || tab_pos == GTK_POS_BOTTOM;
 	gtk_notebook_set_tab_label_packing(nb,
-		GTK_WIDGET(vcs), TRUE, TRUE, GTK_PACK_START);
+		GTK_WIDGET(vcs), tab_expand, TRUE, GTK_PACK_START);
 
 	g_object_set(G_OBJECT(label_button), "user-data", vex, NULL);
 	/* connect some events */
@@ -445,6 +478,17 @@ static gboolean menubar_new_tab_cb(GtkWidget *widget, VexTerm * vex_term)
 	return FALSE;
 }
 
+static void menubar_position_radio_toggled_cb(GtkCheckMenuItem * item, VexTerm * vex_term)
+{
+	gboolean active = gtk_check_menu_item_get_active(item);
+	if (active){
+		gpointer * posp;
+		g_object_get(G_OBJECT(item), "user-data", &posp, NULL);
+		GtkPositionType pos = GPOINTER_TO_INT(posp);
+		vex_term_set_notebook_tabs_position(vex_term, pos);
+	}
+}
+
 /****************************************************************************************************
 * dialogs
 ****************************************************************************************************/
@@ -593,3 +637,20 @@ void vex_term_toggle_menu(VexTerm * vex_term)
 	}
 }
 
+void vex_term_set_notebook_tabs_position(VexTerm * vex_term, GtkPositionType pos)
+{
+	GtkNotebook * nb = GTK_NOTEBOOK(vex_term -> notebook);
+	gtk_notebook_set_tab_pos(nb, pos);
+
+	GtkPositionType pos_old = vex_term -> tabs_position;
+	gboolean tab_expand_old = pos_old == GTK_POS_TOP || pos_old == GTK_POS_BOTTOM;
+	gboolean tab_expand_new = pos == GTK_POS_TOP || pos == GTK_POS_BOTTOM;
+	vex_term -> tabs_position = pos;
+	if(tab_expand_old != tab_expand_new){
+		int i, n = gtk_notebook_get_n_pages(nb);
+		for (i = 0; i < n; i++){
+			gtk_notebook_set_tab_label_packing(nb,
+				gtk_notebook_get_nth_page(nb, i), tab_expand_new, TRUE, GTK_PACK_START);
+		}
+	}
+}

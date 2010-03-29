@@ -3,6 +3,7 @@
 
 	<preferences profile="foo">
 		<debug scrolling-region="no" status-bar="no" />
+		<tabs position="top"/>
 	</preferences>
 
 	<profiles>
