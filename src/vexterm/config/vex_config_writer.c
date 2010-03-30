@@ -85,6 +85,10 @@ void vex_config_writer_write_config_to_file(VexConfigWriter * vcw, char * file, 
 	GtkPositionType tabs_pos = vex_config_get_tabs_position(config);
 	char * tabs_pos_s = "top";
 	switch(tabs_pos){
+		case GTK_POS_TOP:{
+			tabs_pos_s = "top";
+			break;
+		}
 		case GTK_POS_BOTTOM:{
 			tabs_pos_s = "bottom";
 			break;
