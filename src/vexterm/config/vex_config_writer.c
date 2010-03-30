@@ -80,6 +80,26 @@ void vex_config_writer_write_config_to_file(VexConfigWriter * vcw, char * file, 
 	xml_node_add_tag(debug, "scrolling-region", vex_config_get_show_scrolling_region(config) ? "yes" : "no");
 	xml_node_add_tag(debug, "status-bar", vex_config_get_show_status_bar(config) ? "yes" : "no");
 
+	XmlNode * tabs = xml_node_new("tabs");
+	xml_node_add_child(preferences, tabs);
+	GtkPositionType tabs_pos = vex_config_get_tabs_position(config);
+	char * tabs_pos_s = "top";
+	switch(tabs_pos){
+		case GTK_POS_BOTTOM:{
+			tabs_pos_s = "bottom";
+			break;
+		}
+		case GTK_POS_LEFT:{
+			tabs_pos_s = "left";
+			break;
+		}
+		case GTK_POS_RIGHT:{
+			tabs_pos_s = "right";
+			break;
+		}
+	}
+	xml_node_add_tag(tabs, "position", tabs_pos_s);
+
 	XmlNode * profiles = xml_node_new("profiles");
 	xml_node_add_child(configuration, profiles);
 

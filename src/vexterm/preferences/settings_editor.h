@@ -49,6 +49,7 @@ struct _SettingsEditor
 	VexLayeredConfig * vlc;
 
 	GtkWidget * box_profiles;
+	GtkWidget * box_tabs_pos;
 	GSequence * profile_names;
 };
 

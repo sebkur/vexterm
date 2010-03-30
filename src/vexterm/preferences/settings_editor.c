@@ -46,6 +46,7 @@ void settings_editor_constructor(SettingsEditor * settings_editor);
 void settings_editor_finalize(GObject * object);
 
 void settings_editor_box_profiles_changed_cb(GtkComboBox * box_profiles, SettingsEditor * se);
+void settings_editor_box_tabs_pos_changed_cb(GtkComboBox * box_profiles, SettingsEditor * se);
 void settings_editor_show_scrolling_region_toggled_cb(GtkToggleButton * button, SettingsEditor * se);
 void settings_editor_show_status_bar_toggled_cb(GtkToggleButton * button, SettingsEditor * se);
 
@@ -177,15 +178,15 @@ void settings_editor_constructor(SettingsEditor * se)
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_2), 
 		vex_config_get_show_status_bar(local));
 
-	GtkWidget * box_tabs_pos = gtk_combo_box_new_text();
+	se -> box_tabs_pos = gtk_combo_box_new_text();
 	GtkListStore * store = gtk_list_store_new(2, G_TYPE_STRING, G_TYPE_INT);
-	gtk_combo_box_set_model(GTK_COMBO_BOX(box_tabs_pos), GTK_TREE_MODEL(store));
+	gtk_combo_box_set_model(GTK_COMBO_BOX(se -> box_tabs_pos), GTK_TREE_MODEL(store));
 	GtkTreeIter iter;
 	for (i = 0; i < 4; i++){
 		gtk_list_store_append(store, &iter); 
 		gtk_list_store_set(store, &iter, 0, position_names[i], 1, position_values[i], -1);
 		if(position_values[i] == vex_config_get_tabs_position(local)){
-			gtk_combo_box_set_active_iter(GTK_COMBO_BOX(box_tabs_pos), &iter);
+			gtk_combo_box_set_active_iter(GTK_COMBO_BOX(se -> box_tabs_pos), &iter);
 		}
 	}
 
@@ -197,11 +198,14 @@ void settings_editor_constructor(SettingsEditor * se)
 	gtk_table_attach(GTK_TABLE(table), se -> box_profiles,      1, 2, 0, 1, GTK_EXPAND | GTK_FILL, 0, 2, 0);
 	gtk_table_attach(GTK_TABLE(table), check_1,	   	    1, 2, 1, 2, GTK_EXPAND | GTK_FILL, 0, 2, 0);
 	gtk_table_attach(GTK_TABLE(table), check_2,   		    1, 2, 2, 3, GTK_EXPAND | GTK_FILL, 0, 2, 0);
-	gtk_table_attach(GTK_TABLE(table), box_tabs_pos,	    1, 2, 3, 4, GTK_EXPAND | GTK_FILL, 0, 2, 0);
+	gtk_table_attach(GTK_TABLE(table), se -> box_tabs_pos,	    1, 2, 3, 4, GTK_EXPAND | GTK_FILL, 0, 2, 0);
 
 	g_signal_connect(
 		G_OBJECT(se -> box_profiles), "changed",
 		G_CALLBACK(settings_editor_box_profiles_changed_cb), se);
+	g_signal_connect(
+		G_OBJECT(se -> box_tabs_pos), "changed",
+		G_CALLBACK(settings_editor_box_tabs_pos_changed_cb), se);
 	g_signal_connect(
 		G_OBJECT(check_1), "toggled",
 		G_CALLBACK(settings_editor_show_scrolling_region_toggled_cb), se);
@@ -215,6 +219,21 @@ void settings_editor_box_profiles_changed_cb(GtkComboBox * box_profiles, Setting
 	VexConfig * config_local = vex_layered_config_get_config_local(se -> vlc);
 	const char * text = gtk_entry_get_text (GTK_ENTRY (GTK_BIN (se -> box_profiles)->child));
 	vex_config_set_active_profile(config_local, text);
+}
+
+void settings_editor_box_tabs_pos_changed_cb(GtkComboBox * box_profiles, SettingsEditor * se)
+{
+	VexConfig * config_local = vex_layered_config_get_config_local(se -> vlc);
+	GtkTreeModel * model = gtk_combo_box_get_model(GTK_COMBO_BOX(se -> box_tabs_pos));
+	int p = gtk_combo_box_get_active(GTK_COMBO_BOX(se -> box_tabs_pos));
+	GtkTreePath * path = gtk_tree_path_new_from_indices(p, -1);
+	GtkTreeIter iter;
+	gboolean set = gtk_tree_model_get_iter(model, &iter, path);
+	if (set){
+		GtkPositionType pos;
+		gtk_tree_model_get(model, &iter, 1, &pos, -1);
+		vex_config_set_tabs_position(config_local, pos);
+	}
 }
 
 void settings_editor_show_scrolling_region_toggled_cb(GtkToggleButton * button, SettingsEditor * se)
