@@ -53,6 +53,19 @@ static void settings_editor_profile_added_cb(VexConfig * config, char * name, Se
 static void settings_editor_profile_renamed_cb(VexConfig * config, char * name, char * new_name, SettingsEditor * se);
 static void settings_editor_profile_removed_cb(VexConfig * config, char * name, VexProfile * profile, SettingsEditor * se);
 
+static char * position_names[] = {
+	"top",
+	"bottom",
+	"left",
+	"right"
+};
+static GtkPositionType position_values[] = {
+	GTK_POS_TOP,
+	GTK_POS_BOTTOM,
+	GTK_POS_LEFT,
+	GTK_POS_RIGHT
+};
+
 GtkWidget * settings_editor_new(VexLayeredConfig * vlc)
 {
 	SettingsEditor * settings_editor = g_object_new(VEX_TYPE_SETTINGS_EDITOR, NULL);
@@ -98,15 +111,17 @@ void settings_editor_finalize(GObject * object)
 }
 void settings_editor_constructor(SettingsEditor * se)
 {
-	GtkWidget * table = gtk_table_new(2, 3, FALSE);
+	GtkWidget * table = gtk_table_new(2, 4, FALSE);
 	gtk_box_pack_start(GTK_BOX(se), table, TRUE, TRUE, 0);
 
 	GtkWidget * label_profile = gtk_label_new("Profile:");
 	GtkWidget * label_scrolling_region = gtk_label_new("Show Scrolling Region:");
 	GtkWidget * label_status_bar = gtk_label_new("Show Status Bar:");
+	GtkWidget * label_tabs_pos = gtk_label_new("Tabs Position:");
 	gtk_misc_set_alignment(GTK_MISC(label_profile), 0.0, 0.0);
 	gtk_misc_set_alignment(GTK_MISC(label_scrolling_region), 0.0, 0.0);
 	gtk_misc_set_alignment(GTK_MISC(label_status_bar), 0.0, 0.0);
+	gtk_misc_set_alignment(GTK_MISC(label_tabs_pos), 0.0, 0.0);
 
 	VexConfig * global = vex_layered_config_get_config_global(se -> vlc);
 	VexConfig * local = vex_layered_config_get_config_local(se -> vlc);
@@ -162,14 +177,27 @@ void settings_editor_constructor(SettingsEditor * se)
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_2), 
 		vex_config_get_show_status_bar(local));
 
+	GtkWidget * box_tabs_pos = gtk_combo_box_new_text();
+	GtkListStore * store = gtk_list_store_new(2, G_TYPE_STRING, G_TYPE_INT);
+	gtk_combo_box_set_model(GTK_COMBO_BOX(box_tabs_pos), GTK_TREE_MODEL(store));
+	GtkTreeIter iter;
+	for (i = 0; i < 4; i++){
+		gtk_list_store_append(store, &iter); 
+		gtk_list_store_set(store, &iter, 0, position_names[i], 1, position_values[i], -1);
+		if(position_values[i] == vex_config_get_tabs_position(local)){
+			gtk_combo_box_set_active_iter(GTK_COMBO_BOX(box_tabs_pos), &iter);
+		}
+	}
 
 	gtk_table_attach(GTK_TABLE(table), label_profile,	    0, 1, 0, 1, GTK_FILL, 0, 2, 0);
 	gtk_table_attach(GTK_TABLE(table), label_scrolling_region,  0, 1, 1, 2, GTK_FILL, 0, 2, 0);
 	gtk_table_attach(GTK_TABLE(table), label_status_bar, 	    0, 1, 2, 3, GTK_FILL, 0, 2, 0);
+	gtk_table_attach(GTK_TABLE(table), label_tabs_pos, 	    0, 1, 3, 4, GTK_FILL, 0, 2, 0);
 
 	gtk_table_attach(GTK_TABLE(table), se -> box_profiles,      1, 2, 0, 1, GTK_EXPAND | GTK_FILL, 0, 2, 0);
 	gtk_table_attach(GTK_TABLE(table), check_1,	   	    1, 2, 1, 2, GTK_EXPAND | GTK_FILL, 0, 2, 0);
 	gtk_table_attach(GTK_TABLE(table), check_2,   		    1, 2, 2, 3, GTK_EXPAND | GTK_FILL, 0, 2, 0);
+	gtk_table_attach(GTK_TABLE(table), box_tabs_pos,	    1, 2, 3, 4, GTK_EXPAND | GTK_FILL, 0, 2, 0);
 
 	g_signal_connect(
 		G_OBJECT(se -> box_profiles), "changed",
