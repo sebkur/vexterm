@@ -65,6 +65,7 @@ void split_it(SplittableCollection * sc, GtkSplitPosition pos)
 	GtkSplittable * split = splittable_collection_get_active_splittable(VEX_SPLITTABLE_COLLECTION(sc));
 	printf("acitve: %p\n", split);
 	GtkWidget * v1 = vex_single_new("/home/z/", NULL);
+	vex_single_set_show_scrolling_region(VEX_VEX_SINGLE(v1), FALSE);
 
 	if (gtk_splittable_is_empty(split)){
 		// empty
@@ -117,18 +118,10 @@ int main(int argc, char *argv[])
 	/***************************************************************************
 	 * window content **********************************************************
 	 ***************************************************************************/
-	GtkWidget * a = gtk_button_new_with_label("asdf");
-	GtkWidget * b = gtk_button_new_with_label("foo");
-	GtkWidget * c = gtk_button_new_with_label("bar");
-
-	GtkWidget * v1 = vex_single_new("/home/z/", NULL);
-	GtkWidget * v2 = vex_single_new("/home/z/", NULL);
-	GtkWidget * v3 = vex_single_new("/home/z/", NULL);
-
 	GtkWidget * sc = splittable_collection_new();	
-	GtkSplittable * split = gtk_splittable_new();
-	splittable_collection_set_main_component(sc, GTK_WIDGET(split));
-	gtk_splittable_set_child(split, v1);
+	GtkWidget * split = gtk_splittable_new();
+	splittable_collection_set_main_component(VEX_SPLITTABLE_COLLECTION(sc), GTK_WIDGET(split));
+	split_it(VEX_SPLITTABLE_COLLECTION(sc), 0);
 
 	GtkWidget * box_h = gtk_hbox_new(FALSE, 0);
 	gtk_container_add(GTK_CONTAINER(main_window), box_h);
