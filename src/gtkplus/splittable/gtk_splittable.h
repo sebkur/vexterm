@@ -63,6 +63,7 @@ struct _GtkSplittable
 	GtkWidget * child1;
 	GtkWidget * child2;
 
+	GtkAllocation last_seen_allocation;
 	int paned_width;
 	int paned_height;
 	double percentage;

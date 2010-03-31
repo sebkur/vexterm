@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
 
 #include <glib.h>
 #include <gtk/gtk.h>
@@ -243,7 +244,20 @@ void gtk_splittable_set_child_by_position(GtkSplittable * splittable, GtkWidget 
 
 void gtk_splittable_paned_position_cb(GtkPaned * paned, GParamSpec * pspec, GtkSplittable * splittable)
 {
-	if (splittable -> size_initialized && !splittable -> size_event){
+	//printf("position\n");
+	gboolean size_changed = FALSE;
+	if (memcmp(
+		&(GTK_WIDGET(splittable) -> allocation),
+		&(splittable -> last_seen_allocation),
+		sizeof(GtkAllocation)) != 0)
+	{
+		/* this catches the case (seen by maximizing and unmaximizing the window)
+		   when the slider is being set from within the GtkPaned's size_allocate
+		   function */
+		size_changed = TRUE;
+	}
+	if (splittable -> size_initialized && !size_changed && !splittable -> size_event)
+	{
 		/* only set percentage, if 'size_cb' has been called at least once. otherwise
 		   we could see 's == 1' and this would destroy the initial position given by 
 		   the user-set or default percentage */
@@ -263,18 +277,21 @@ void gtk_splittable_paned_position_cb(GtkPaned * paned, GParamSpec * pspec, GtkS
 
 void gtk_splittable_paned_size_cb(GtkPaned * paned, GtkAllocation * allocation, GtkSplittable * splittable)
 {
+	//printf("size allocate\n");
+	splittable -> last_seen_allocation = *allocation;
 	splittable -> size_initialized = TRUE;
 	if ((allocation -> width != splittable -> paned_width) || (allocation -> height != splittable -> paned_height)){
 		/* size changed */
+		//printf("size change\n");
 		splittable -> paned_width = allocation -> width;
 		splittable -> paned_height = allocation -> height;
+		splittable -> size_event = TRUE;
 		int s = splittable -> split_mode == GTK_SPLITTED_HORIZONTALLY ? allocation -> width : allocation -> height;
 		int target = (int) (s * splittable -> percentage);
 		if (target != gtk_paned_get_position(paned)){
+			//printf("setposition\n");
 			gtk_paned_set_position(paned, target);
 		}
-		//printf("size change\n");
-		splittable -> size_event = TRUE;
 	}
 }
 
