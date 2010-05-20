@@ -206,6 +206,7 @@ static void XMLCALL srt_parser_StartElementCallback(
 		const char * size = srt_parser_get_value(atts, "size");
 		const char * font = srt_parser_get_value(atts, "font");
 		const char * weight = srt_parser_get_value(atts, "weight");
+		const char * justification = srt_parser_get_value(atts, "justification");
 		if (name == NULL) return;
 		#if DEBUG_XML
 		printf("adding style: %s\n", name);
@@ -220,6 +221,15 @@ static void XMLCALL srt_parser_StartElementCallback(
 		if (weight != NULL){
 			if (strcmp(weight, "bold") == 0){
 				g_object_set(tag, "weight", PANGO_WEIGHT_BOLD, NULL);
+			}
+		}
+		if (justification != NULL){
+			if (strcmp(justification, "left") == 0){
+				g_object_set(tag, "justification", GTK_JUSTIFY_LEFT, NULL);
+			}else if (strcmp(justification, "center") == 0){
+				g_object_set(tag, "justification", GTK_JUSTIFY_CENTER, NULL);
+			}else if (strcmp(justification, "right") == 0){
+				g_object_set(tag, "justification", GTK_JUSTIFY_RIGHT, NULL);
 			}
 		}
 	}/*else if(strcmp(name, "p") == 0){
