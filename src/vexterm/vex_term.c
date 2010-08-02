@@ -59,6 +59,7 @@ G_DEFINE_TYPE (VexTerm, vex_term, GTK_TYPE_VBOX);
 
 void vex_term_constructor(VexTerm * vex_term, VexLayeredConfig * vlc);
 void vex_term_add_tab(VexTerm * vex_term);
+void vex_term_toggle_right_margin(VexTerm * vex_term);
 void vex_term_close_tab(VexTerm * vex_term);
 void vex_term_move_tab_focus(VexTerm * vex_term, int direction);
 void vex_term_move_tab(VexTerm * vex_term, int direction);
@@ -213,6 +214,18 @@ void vex_term_constructor(VexTerm * vex_term, VexLayeredConfig * vlc)
 		G_CALLBACK(menubar_new_tab_cb), vex_term);
 
 	gtk_widget_set_sensitive(vex_term -> menu -> menu_file_new_window, FALSE);
+}
+
+void vex_term_toggle_right_margin(VexTerm * vex_term)
+{
+	GtkNotebook * nb = GTK_NOTEBOOK(vex_term -> notebook);
+	int x = gtk_notebook_get_current_page(nb);
+	if (x >= 0){
+		VexSingleContainer * vcs = VEX_VEX_SINGLE_CONTAINER(gtk_notebook_get_nth_page(nb, x));
+		VexSingle * vex_current = vex_single_container_get_vex_single(vcs);
+		terminal_widget_set_show_right_margin(vex_current -> terminal_widget,
+				!terminal_widget_get_show_right_margin(vex_current -> terminal_widget));
+	}
 }
 
 void vex_term_add_tab(VexTerm * vex_term)
@@ -407,6 +420,10 @@ static gboolean vex_term_key_press_cb(GtkWidget * widget, GdkEventKey * event, V
 	}
 	if ((event -> state & modifiers) == (GDK_CONTROL_MASK | GDK_SHIFT_MASK)){
 		switch(event -> keyval){
+			case GDK_M:{
+				vex_term_toggle_right_margin(vex_term);
+				break;
+			}
 			case GDK_T:{
 				vex_term_add_tab(vex_term);
 				break;

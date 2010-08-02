@@ -352,6 +352,7 @@ static void terminal_widget_init(TerminalWidget *terminal_widget)
 
 	terminal_widget -> cursor_visible = TRUE;
 	terminal_widget -> show_scrolling_region = TRUE;
+	terminal_widget -> show_right_margin = FALSE;
 
 	terminal_widget -> ascent = -1;
 
@@ -463,6 +464,19 @@ void terminal_widget_set_show_scrolling_region(TerminalWidget * terminal_widget,
 {
 	if (terminal_widget -> show_scrolling_region != show){
 		terminal_widget -> show_scrolling_region = show;
+		gtk_widget_queue_draw(GTK_WIDGET(terminal_widget));
+	}
+}
+
+gboolean terminal_widget_get_show_right_margin(TerminalWidget * terminal_widget)
+{
+	return terminal_widget -> show_right_margin;
+}
+
+void terminal_widget_set_show_right_margin(TerminalWidget * terminal_widget, gboolean show)
+{
+	if (terminal_widget -> show_right_margin != show){
+		terminal_widget -> show_right_margin = show;
 		gtk_widget_queue_draw(GTK_WIDGET(terminal_widget));
 	}
 }
@@ -1237,6 +1251,17 @@ static gboolean terminal_widget_expose(GtkWidget * widget, GdkEventExpose * even
 		cairo_rectangle(cr, 
 			0, (screen -> scroll_top - 1) * c_h, 
 			widget -> allocation.width, (screen -> scroll_bot - screen -> scroll_top + 1) * c_h);
+		cairo_stroke(cr);
+		cairo_pattern_destroy(pattern_sr);
+	}
+
+	/* draw a 80-chars-margin */
+	if (terminal_widget -> show_right_margin){
+		int x = 80 * terminal_widget -> c_w;
+		cairo_pattern_t * pattern_sr = cairo_pattern_create_rgba(1.0, 0.0, 0.0, 0.5);
+		cairo_set_source(cr, pattern_sr);
+		cairo_move_to(cr, x, 0);
+		cairo_line_to(cr, x, terminal_widget -> height);
 		cairo_stroke(cr);
 		cairo_pattern_destroy(pattern_sr);
 	}

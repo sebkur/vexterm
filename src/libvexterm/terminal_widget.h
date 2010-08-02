@@ -138,6 +138,7 @@ struct _TerminalWidget
 
 	gboolean cursor_visible; // maybe into the screen??? may perform better concerning error confinement
 	gboolean show_scrolling_region;
+	gboolean show_right_margin;
 
 	History * history;
 	int history_pos;
@@ -171,6 +172,9 @@ void terminal_widget_get_size(TerminalWidget * terminal_widget, int * width, int
 
 gboolean terminal_widget_get_show_scrolling_region(TerminalWidget * terminal_widget);
 void terminal_widget_set_show_scrolling_region(TerminalWidget * terminal_widget, gboolean show);
+
+gboolean terminal_widget_get_show_right_margin(TerminalWidget * terminal_widget);
+void terminal_widget_set_show_right_margin(TerminalWidget * terminal_widget, gboolean show);
 
 void terminal_widget_set_font_name(TerminalWidget * terminal_widget, char * font_name);
 void terminal_widget_set_font_size(TerminalWidget * terminal_widget, int font_size);
