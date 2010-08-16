@@ -118,8 +118,10 @@ void entry_changed_cb(GtkEditable * editable, gpointer user_data)
 {
 	ChooseNameDialog * cnd = (ChooseNameDialog*) user_data;
 	const char * name = gtk_entry_get_text(GTK_ENTRY(editable));
-	gboolean ok = cnd -> name_ok_function(name, cnd -> name_ok_data);
-	gtk_widget_set_sensitive(cnd -> button_ok, ok);
+	if (cnd -> name_ok_function != NULL){
+		gboolean ok = cnd -> name_ok_function(name, cnd -> name_ok_data);
+		gtk_widget_set_sensitive(cnd -> button_ok, ok);
+	}
 }
 
 const char * choose_name_dialog_get_name(ChooseNameDialog * dialog)

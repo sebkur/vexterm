@@ -33,6 +33,8 @@
 #include "../helpers/tool.h"
 #include "../helpers/util.h"
 
+#include "../gtkplus/dialog/choose_name_dialog.h"
+
 #include "../libvexterm/terminal_config.h"
 #include "vex_term.h"
 #include "vex_single.h"
@@ -89,6 +91,9 @@ void vex_term_rename_profile_entry(VexTerm * vex_term, char * name, char * new_n
 void vex_term_toggle_fullscreen(VexTerm * vex_term);
 void vex_term_toggle_menu(VexTerm * vex_term);
 void vex_term_set_notebook_tabs_position(VexTerm * vex_term, GtkPositionType pos);
+
+void vex_term_show_rename_dialog(VexTerm * vex_term);
+void vex_term_set_title(VexTerm * vex_term, char * title);
 
 GtkWidget * vex_term_new(VexLayeredConfig * vlc)
 {
@@ -444,6 +449,10 @@ static gboolean vex_term_key_press_cb(GtkWidget * widget, GdkEventKey * event, V
 				vex_term_toggle_menu(vex_term);
 				return TRUE;
 			}
+			case GDK_F2:{
+				vex_term_show_rename_dialog(vex_term);
+				return TRUE;
+			}
 			case GDK_F11:{
 				vex_term_toggle_fullscreen(vex_term);
 				return TRUE;
@@ -670,4 +679,27 @@ void vex_term_set_notebook_tabs_position(VexTerm * vex_term, GtkPositionType pos
 				gtk_notebook_get_nth_page(nb, i), tab_expand_new, TRUE, GTK_PACK_START);
 		}
 	}
+}
+
+void vex_term_show_rename_dialog(VexTerm * vex_term)
+{
+	GtkWidget * window = find_containing_gtk_window(GTK_WIDGET(vex_term));
+	const char * title = gtk_window_get_title(GTK_WINDOW(window));
+
+	GtkWidget * d = choose_name_dialog_new("Enter title", FALSE, "", 
+			"Title", "", title, NULL, NULL);
+
+	int response = gtk_dialog_run(GTK_DIALOG(d));
+	if (response == GTK_RESPONSE_OK){
+		const char * new_title = choose_name_dialog_get_name(
+				VEX_CHOOSE_NAME_DIALOG(d));
+		vex_term_set_title(vex_term, (char*) new_title);
+	}
+	gtk_widget_destroy(d);
+}
+
+void vex_term_set_title(VexTerm * vex_term, char * title)
+{
+	GtkWidget * window = find_containing_gtk_window(GTK_WIDGET(vex_term));
+	gtk_window_set_title(GTK_WINDOW(window), title);
 }
