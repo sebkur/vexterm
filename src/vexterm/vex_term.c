@@ -59,8 +59,8 @@ G_DEFINE_TYPE (VexTerm, vex_term, GTK_TYPE_VBOX);
 //static guint vex_term_signals[LAST_SIGNAL] = { 0 };
 //g_signal_emit (widget, vex_term_signals[SIGNAL_NAME_n], 0);
 
-void vex_term_constructor(VexTerm * vex_term, VexLayeredConfig * vlc);
-void vex_term_add_tab(VexTerm * vex_term);
+void vex_term_constructor(VexTerm * vex_term, VexLayeredConfig * vlc, char * pwd);
+void vex_term_add_tab(VexTerm * vex_term, char * dir);
 void vex_term_toggle_right_margin(VexTerm * vex_term);
 void vex_term_move_margin(VexTerm * vex_term, int delta);
 void vex_term_close_tab(VexTerm * vex_term);
@@ -96,11 +96,11 @@ void vex_term_set_notebook_tabs_position(VexTerm * vex_term, GtkPositionType pos
 void vex_term_show_rename_dialog(VexTerm * vex_term);
 void vex_term_set_title(VexTerm * vex_term, char * title);
 
-GtkWidget * vex_term_new(VexLayeredConfig * vlc)
+GtkWidget * vex_term_new(VexLayeredConfig * vlc, char * pwd)
 {
 	VexTerm * vex_term = g_object_new(VEX_TYPE_VEX_TERM, NULL);
 
-	vex_term_constructor(vex_term, vlc);
+	vex_term_constructor(vex_term, vlc, pwd);
 
 	return GTK_WIDGET(vex_term);
 }
@@ -121,7 +121,7 @@ static void vex_term_init(VexTerm *vex_term)
 {
 }
 
-void vex_term_constructor(VexTerm * vex_term, VexLayeredConfig * vlc)
+void vex_term_constructor(VexTerm * vex_term, VexLayeredConfig * vlc, char * pwd)
 {
 	vex_term -> vlc = vlc;
 	vex_term -> notebook = gtk_notebook_new();
@@ -146,7 +146,7 @@ void vex_term_constructor(VexTerm * vex_term, VexLayeredConfig * vlc)
 	gtk_box_pack_start(GTK_BOX(vex_term), GTK_WIDGET(vex_term -> menu), FALSE, FALSE, 0);
 	gtk_box_pack_start(GTK_BOX(vex_term), vex_term -> notebook, TRUE, TRUE, 0);
 
-	vex_term_add_tab(vex_term);
+	vex_term_add_tab(vex_term, pwd);
 
 	VexSingleContainer * vcs = VEX_VEX_SINGLE_CONTAINER(gtk_notebook_get_nth_page(GTK_NOTEBOOK(vex_term -> notebook), 0));
 	gtk_menu_item_set_submenu(
@@ -248,7 +248,7 @@ void vex_term_move_margin(VexTerm * vex_term, int delta)
 	}
 }
 
-void vex_term_add_tab(VexTerm * vex_term)
+void vex_term_add_tab(VexTerm * vex_term, char * dir)
 {
 	char * profile_name = vex_config_get_active_profile(vex_layered_config_get_config_local(vex_term -> vlc));
 	if (profile_name == NULL){
@@ -265,7 +265,7 @@ void vex_term_add_tab(VexTerm * vex_term)
 
 	/* retrieve the currently activated terminal's pwd so that we can start
 	 * the new one at the same path */
-	char * pwd = NULL;
+	char * pwd = dir;
 	int x = gtk_notebook_get_current_page(nb);
 	if (x >= 0){
 		VexSingleContainer * vcs = VEX_VEX_SINGLE_CONTAINER(gtk_notebook_get_nth_page(nb, x));
@@ -453,7 +453,7 @@ static gboolean vex_term_key_press_cb(GtkWidget * widget, GdkEventKey * event, V
 				break;
 			}
 			case GDK_T:{
-				vex_term_add_tab(vex_term);
+				vex_term_add_tab(vex_term, NULL);
 				break;
 			}
 			case GDK_W:{
@@ -523,7 +523,7 @@ static gboolean menubar_new_window_cb(GtkWidget *widget, VexTerm * vex_term)
 
 static gboolean menubar_new_tab_cb(GtkWidget *widget, VexTerm * vex_term)
 {
-	vex_term_add_tab(vex_term);
+	vex_term_add_tab(vex_term, NULL);
 	return FALSE;
 }
 

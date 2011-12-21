@@ -151,6 +151,8 @@ struct _TerminalWidget
 	TerminalPosition pos_press;
 	TerminalPosition pos_motion;
 	TerminalSelection selection;
+
+	int margin_position;
 };
 
 struct _TerminalWidgetClass
@@ -175,6 +177,9 @@ void terminal_widget_set_show_scrolling_region(TerminalWidget * terminal_widget,
 
 gboolean terminal_widget_get_show_right_margin(TerminalWidget * terminal_widget);
 void terminal_widget_set_show_right_margin(TerminalWidget * terminal_widget, gboolean show);
+
+void terminal_widget_set_margin_position(TerminalWidget * terminal_widget, int position);
+int terminal_widget_get_margin_position(TerminalWidget * terminal_widget);
 
 void terminal_widget_set_font_name(TerminalWidget * terminal_widget, char * font_name);
 void terminal_widget_set_font_size(TerminalWidget * terminal_widget, int font_size);

@@ -398,6 +398,8 @@ void terminal_widget_constructor(TerminalWidget * terminal_widget)
 
 	terminal_widget_configure_font(terminal_widget);
 
+	terminal_widget -> margin_position = 80;
+
 	pthread_mutexattr_t mta;
 	pthread_mutexattr_init(&mta);
 	pthread_mutex_init(&terminal_widget -> mutex, &mta);
@@ -479,6 +481,17 @@ void terminal_widget_set_show_right_margin(TerminalWidget * terminal_widget, gbo
 		terminal_widget -> show_right_margin = show;
 		gtk_widget_queue_draw(GTK_WIDGET(terminal_widget));
 	}
+}
+
+void terminal_widget_set_margin_position(TerminalWidget * terminal_widget, int position)
+{
+	terminal_widget -> margin_position = position;
+	gtk_widget_queue_draw(GTK_WIDGET(terminal_widget));
+}
+
+int terminal_widget_get_margin_position(TerminalWidget * terminal_widget)
+{
+	return terminal_widget -> margin_position;
 }
 
 int terminal_widget_get_current_screen(TerminalWidget * terminal_widget)
@@ -1257,7 +1270,7 @@ static gboolean terminal_widget_expose(GtkWidget * widget, GdkEventExpose * even
 
 	/* draw a 80-chars-margin */
 	if (terminal_widget -> show_right_margin){
-		int x = 80 * terminal_widget -> c_w;
+		int x = terminal_widget -> margin_position * terminal_widget -> c_w;
 		cairo_pattern_t * pattern_sr = cairo_pattern_create_rgba(1.0, 0.0, 0.0, 0.5);
 		cairo_set_source(cr, pattern_sr);
 		cairo_move_to(cr, x, 0);

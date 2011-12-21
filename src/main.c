@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
 		if (rc == 3) vex_win_x_set = TRUE;
 		if (rc == 4) vex_win_y_set = TRUE;
 	}
-	//const char * pwd = poptGetArg(pcontext); // will be NULL if not set //TODO: use this
+	const char * pwd = poptGetArg(pcontext); // will be NULL if not set
 
 	/***************************************************************************
 	 * initialization **********************************************************
@@ -124,7 +124,7 @@ int main(int argc, char *argv[])
 	/***************************************************************************
 	 * window content **********************************************************
 	 ***************************************************************************/
-	VexTerm * vex = VEX_VEX_TERM(vex_term_new(vlc));
+	VexTerm * vex = VEX_VEX_TERM(vex_term_new(vlc, pwd));
 
 	GtkWidget * box_h = gtk_hbox_new(FALSE, 0);
 	gtk_box_pack_start(GTK_BOX(box_h), GTK_WIDGET(vex), TRUE, TRUE, 0);

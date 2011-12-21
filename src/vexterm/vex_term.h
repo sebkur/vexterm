@@ -78,6 +78,6 @@ struct _VexTermClass
 
 GType vex_term_get_type (void) G_GNUC_CONST;
 
-GtkWidget * vex_term_new(VexLayeredConfig * vlc);
+GtkWidget * vex_term_new(VexLayeredConfig * vlc, char * pwd);
 
 #endif /* _VEX_TERM_H_ */
