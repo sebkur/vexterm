@@ -62,6 +62,7 @@ G_DEFINE_TYPE (VexTerm, vex_term, GTK_TYPE_VBOX);
 void vex_term_constructor(VexTerm * vex_term, VexLayeredConfig * vlc);
 void vex_term_add_tab(VexTerm * vex_term);
 void vex_term_toggle_right_margin(VexTerm * vex_term);
+void vex_term_move_margin(VexTerm * vex_term, int delta);
 void vex_term_close_tab(VexTerm * vex_term);
 void vex_term_move_tab_focus(VexTerm * vex_term, int direction);
 void vex_term_move_tab(VexTerm * vex_term, int direction);
@@ -230,6 +231,20 @@ void vex_term_toggle_right_margin(VexTerm * vex_term)
 		VexSingle * vex_current = vex_single_container_get_vex_single(vcs);
 		terminal_widget_set_show_right_margin(vex_current -> terminal_widget,
 				!terminal_widget_get_show_right_margin(vex_current -> terminal_widget));
+	}
+}
+
+void vex_term_move_margin(VexTerm * vex_term, int delta)
+{
+	GtkNotebook * nb = GTK_NOTEBOOK(vex_term -> notebook);
+	int x = gtk_notebook_get_current_page(nb);
+	if (x >= 0){
+		VexSingleContainer * vcs = VEX_VEX_SINGLE_CONTAINER(gtk_notebook_get_nth_page(nb, x));
+		VexSingle * vex_current = vex_single_container_get_vex_single(vcs);
+		TerminalWidget * tw = vex_current -> terminal_widget;
+		int oldpos = terminal_widget_get_margin_position(tw);
+		int newpos = oldpos + delta;
+		terminal_widget_set_margin_position(tw,	newpos);
 	}
 }
 
@@ -427,6 +442,14 @@ static gboolean vex_term_key_press_cb(GtkWidget * widget, GdkEventKey * event, V
 		switch(event -> keyval){
 			case GDK_M:{
 				vex_term_toggle_right_margin(vex_term);
+				break;
+			}
+			case GDK_H:{
+				vex_term_move_margin(vex_term, -1);
+				break;
+			}
+			case GDK_L:{
+				vex_term_move_margin(vex_term, 1);
 				break;
 			}
 			case GDK_T:{
