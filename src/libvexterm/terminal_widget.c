@@ -154,6 +154,8 @@ void terminal_widget_configure_font(TerminalWidget * terminal_widget);
 
 gboolean terminal_widget_get_selected_text(TerminalWidget * terminal_widget, StringBuffer ** buffer);
 
+void input_commit_cb (GtkIMContext *context, const gchar * str, gpointer data);
+
 TerminalWidget * terminal_widget_new()
 {
 	TerminalConfig * config = terminal_config_new();
@@ -367,6 +369,9 @@ static void terminal_widget_init(TerminalWidget *terminal_widget)
 	terminal_widget -> selection.start.row = 0;
 	terminal_widget -> selection.end.col = 0;
 	terminal_widget -> selection.end.row = 0;
+	
+	terminal_widget -> im_context = gtk_im_context_simple_new();
+	g_signal_connect (terminal_widget -> im_context, "commit", G_CALLBACK (input_commit_cb), terminal_widget);
 }
 
 void terminal_widget_constructor(TerminalWidget * terminal_widget)
@@ -652,11 +657,12 @@ static gboolean terminal_widget_key_press(GtkWidget * widget, GdkEventKey * even
 				break;
 			}
 			default:{
-				char outbuf[6];
-				guint32 uch = gdk_keyval_to_unicode(event -> keyval);
-				gint l = g_unichar_to_utf8(uch, outbuf);
-				write(terminal_widget -> master, outbuf, l);
+				//char outbuf[6];
+				//guint32 uch = gdk_keyval_to_unicode(event -> keyval);
+				//gint l = g_unichar_to_utf8(uch, outbuf);
+				//write(terminal_widget -> master, outbuf, l);
 				//printf("%s\n", gdk_keyval_name(event -> keyval));
+				gtk_im_context_filter_keypress(terminal_widget -> im_context, event);
 				break;
 			}
 		}
@@ -679,6 +685,14 @@ static gboolean terminal_widget_key_press(GtkWidget * widget, GdkEventKey * even
 		}
 	}
 	return TRUE;
+}
+
+void input_commit_cb (GtkIMContext *context, const gchar * str, gpointer data) {
+	TerminalWidget * terminal_widget = data;
+	gint l = strlen(str);
+	char * wbuf = g_strdup_printf("%s", str);
+	write(terminal_widget -> master, wbuf, l);
+	free(wbuf);
 }
 
 void send_cursor(TerminalWidget * terminal_widget, int key) // xterm doc

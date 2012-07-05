@@ -153,6 +153,8 @@ struct _TerminalWidget
 	TerminalSelection selection;
 
 	int margin_position;
+
+	GtkIMContext *im_context;
 };
 
 struct _TerminalWidgetClass
