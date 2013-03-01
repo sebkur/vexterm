@@ -25,6 +25,9 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include <sys/stat.h>
+#include <sys/types.h>
+
 #include <glib.h>
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
@@ -592,6 +595,10 @@ static void preferences_response_cb(GtkDialog * dialog, int response, VexTerm * 
 		printf("save config\n");
 
 		char * conf_file_local = vex_term_get_config_file_local();
+		char * parent = parent_dir(conf_file_local);
+		if (parent != NULL) {
+			mkdir(parent, S_IRWXU | S_IRGRP | S_IXGRP);
+		}
 		char * conf_file_local_tmp = g_strconcat(conf_file_local, ".tmp", NULL);
 
 		printf("writing to: %s\n", conf_file_local_tmp);
