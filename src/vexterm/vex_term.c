@@ -66,6 +66,7 @@ void vex_term_constructor(VexTerm * vex_term, VexLayeredConfig * vlc, char * pwd
 void vex_term_add_tab(VexTerm * vex_term, char * dir);
 void vex_term_toggle_right_margin(VexTerm * vex_term);
 void vex_term_move_margin(VexTerm * vex_term, int delta);
+void vex_term_change_font_size(VexTerm * vex_term, int delta);
 void vex_term_close_tab(VexTerm * vex_term);
 void vex_term_move_tab_focus(VexTerm * vex_term, int direction);
 void vex_term_move_tab(VexTerm * vex_term, int direction);
@@ -248,6 +249,25 @@ void vex_term_move_margin(VexTerm * vex_term, int delta)
 		int oldpos = terminal_widget_get_margin_position(tw);
 		int newpos = oldpos + delta;
 		terminal_widget_set_margin_position(tw,	newpos);
+	}
+}
+
+void vex_term_change_font_size(VexTerm * vex_term, int delta)
+{
+	GtkNotebook * nb = GTK_NOTEBOOK(vex_term -> notebook);
+	int x = gtk_notebook_get_current_page(nb);
+	if (x >= 0){
+		VexSingleContainer * vcs = VEX_VEX_SINGLE_CONTAINER(gtk_notebook_get_nth_page(nb, x));
+		VexSingle * vex_current = vex_single_container_get_vex_single(vcs);
+		VexProfile * profile = vex_single_get_profile(vex_current);
+		int font_size = vex_profile_get_font_size(profile);
+		int new_font_size = font_size + delta;
+		if (new_font_size < 1) {
+			new_font_size = 1;
+		}
+		VexProfile * new_profile = vex_profile_duplicate(profile, TRUE);
+		vex_profile_set_font_size(new_profile, new_font_size);
+		vex_single_set_profile(vex_current, new_profile);
 	}
 }
 
@@ -437,6 +457,14 @@ static gboolean vex_term_key_press_cb(GtkWidget * widget, GdkEventKey * event, V
 			}
 			case GDK_Page_Down:{
 				vex_term_move_tab_focus(vex_term, 1);
+				return TRUE;
+			}
+			case GDK_plus:{
+				vex_term_change_font_size(vex_term, 1);
+				return TRUE;
+			}
+			case GDK_minus:{
+				vex_term_change_font_size(vex_term, -1);
 				return TRUE;
 			}
 		}
