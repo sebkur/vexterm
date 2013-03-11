@@ -78,5 +78,11 @@ as nice as libvte.
 <br />
 <font style="key">Ctrl + Shift + F11:           </font>
 <font style="val">Toggle fullscreen</font>
+<br /><br />
+<font style="key">Ctrl + +:                     </font>
+<font style="val">Increase font size</font>
+<br />
+<font style="key">Ctrl + -:                     </font>
+<font style="val">Decrease font size</font>
 </font>
 </document>
