@@ -651,8 +651,33 @@ static gboolean terminal_widget_key_press(GtkWidget * widget, GdkEventKey * even
 				write(terminal_widget -> master, wbuf, 1);
 				break;
 			}
-			case GDK_F9:{
-				char * wbuf = g_strdup_printf("\033[20~");
+			case GDK_F1:
+			case GDK_F2:
+			case GDK_F3:
+			case GDK_F4:
+			case GDK_F5:{
+				int fn = event -> keyval - GDK_F1 + 1;
+				int fc = fn + 10;
+				char * wbuf = g_strdup_printf("\033[%d~", fc);
+				write(terminal_widget -> master, wbuf, 5);
+				break;
+			}
+			case GDK_F6:
+			case GDK_F7:
+			case GDK_F8:
+			case GDK_F9:
+			case GDK_F10:{
+				int fn = event -> keyval - GDK_F1 + 1;
+				int fc = fn + 11;
+				char * wbuf = g_strdup_printf("\033[%d~", fc);
+				write(terminal_widget -> master, wbuf, 5);
+				break;
+			}
+			case GDK_F11:
+			case GDK_F12:{
+				int fn = event -> keyval - GDK_F1 + 1;
+				int fc = fn + 12;
+				char * wbuf = g_strdup_printf("\033[%d~", fc);
 				write(terminal_widget -> master, wbuf, 5);
 				break;
 			}
