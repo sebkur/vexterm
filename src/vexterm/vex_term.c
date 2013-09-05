@@ -49,6 +49,7 @@
 #include "preferences/preferences.h"
 
 #define DEFAULT_PROFILE "default"
+#define MINIMUM_FONT_SIZE 4
 
 G_DEFINE_TYPE (VexTerm, vex_term, GTK_TYPE_VBOX);
 
@@ -259,15 +260,12 @@ void vex_term_change_font_size(VexTerm * vex_term, int delta)
 	if (x >= 0){
 		VexSingleContainer * vcs = VEX_VEX_SINGLE_CONTAINER(gtk_notebook_get_nth_page(nb, x));
 		VexSingle * vex_current = vex_single_container_get_vex_single(vcs);
-		VexProfile * profile = vex_single_get_profile(vex_current);
-		int font_size = vex_profile_get_font_size(profile);
+		TerminalConfig * tc = vex_current -> tc;
+		int font_size = terminal_config_get_font_size(tc);
 		int new_font_size = font_size + delta;
-		if (new_font_size < 1) {
-			new_font_size = 1;
+		if (new_font_size >= MINIMUM_FONT_SIZE){
+			terminal_config_set_font_size(tc, new_font_size);
 		}
-		VexProfile * new_profile = vex_profile_duplicate(profile, TRUE);
-		vex_profile_set_font_size(new_profile, new_font_size);
-		vex_single_set_profile(vex_current, new_profile);
 	}
 }
 

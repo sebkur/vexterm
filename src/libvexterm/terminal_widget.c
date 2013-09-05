@@ -391,6 +391,9 @@ void terminal_widget_constructor(TerminalWidget * terminal_widget)
 		G_OBJECT(terminal_widget -> terminal_config), "changed-font",
 		G_CALLBACK(terminal_widget_config_changed_cb), terminal_widget);
 	g_signal_connect(
+		G_OBJECT(terminal_widget -> terminal_config), "changed-font-size",
+		G_CALLBACK(terminal_widget_config_changed_cb), terminal_widget);
+	g_signal_connect(
 		G_OBJECT(terminal_widget -> terminal_config), "changed-colour-palette",
 		G_CALLBACK(terminal_widget_config_changed_cb), terminal_widget);
 
