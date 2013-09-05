@@ -29,6 +29,9 @@
 #include "vex_single.h"
 #include "config/vex_colour_scheme.h"
 
+#define DEFAULT_FONT "Monospace"
+#define DEFAULT_FONT_SIZE 12
+
 G_DEFINE_TYPE (VexSingle, vex_single, GTK_TYPE_VBOX);
 
 enum
@@ -189,6 +192,8 @@ void vex_single_terminal_config_setup_with_profile(VexSingle * vex_single, Termi
 		g_signal_connect(G_OBJECT(profile), "changed-colour-scheme", 
 			G_CALLBACK(vex_single_profiles_colour_scheme_changed_cb), vex_single);
 	}else{
+		terminal_config_set_font_name(tc, DEFAULT_FONT);
+		terminal_config_set_font_size(tc, DEFAULT_FONT_SIZE);
 		TerminalColourPalette * palette = terminal_colour_palette_new_default();
 		terminal_config_set_colour_palette(tc, palette);
 	}
