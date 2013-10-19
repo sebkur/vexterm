@@ -2495,13 +2495,40 @@ void emit_set_size(TerminalWidget * terminal_widget)
 
 /* Selection */
 
-void terminal_widget_selection_add(TerminalScreen * screen, StringBuffer * buffer, int r, int c_start, int c_stop)
+GArray * terminal_widget_get_row(TerminalWidget * terminal_widget, int r)
 {
+	TerminalScreen * screen = terminal_widget -> screen_current;
+	if (screen == terminal_widget -> screen_alternate){
+		if (r < terminal_widget -> screen_current -> rows -> len){
+			GArray * row = g_array_index(screen -> rows, GArray*, r);
+			return row;
+		}
+		return NULL;
+	}else{
+		int hlen = history_get_number_of_elements(terminal_widget -> history);
+		int slen = terminal_widget -> screen_current -> rows -> len;
+		int hpos = terminal_widget -> history_pos;
+		int hn = hlen - hpos;
+		if (r < hn && r < terminal_widget -> n_rows){
+			GArray * row = (GArray*) history_get(terminal_widget -> history, hpos + r);
+			return row;
+		}
+		if (r >= hn && r < terminal_widget -> n_rows && r - hn < slen){
+			GArray * row = g_array_index(screen -> rows, GArray*, r - hn);
+			return row;
+		}
+		return NULL;
+	}
+}
+
+void terminal_widget_selection_add(TerminalWidget * terminal_widget, StringBuffer * buffer, int r, int c_start, int c_stop)
+{
+	TerminalScreen * screen = terminal_widget -> screen_current;
 	//printf("%d %d\n", r, screen -> rows -> len);
 	if (r >= screen -> rows -> len){
 		return;
 	}
-	GArray * row = g_array_index(screen -> rows, GArray*, r);
+	GArray * row = terminal_widget_get_row(terminal_widget, r);
 	int c;
 	if (c_stop == -1) c_stop = row -> len - 1;
 	for (c = c_start; c <= c_stop && c < row -> len; c++){
@@ -2516,8 +2543,6 @@ gboolean terminal_widget_get_selected_text(TerminalWidget * terminal_widget, Str
 		return FALSE;
 	}
 
-	TerminalScreen * screen = terminal_widget -> screen_current;
-
 	int c1 = terminal_widget -> selection.start.col;
 	int r1 = terminal_widget -> selection.start.row;
 	int c2 = terminal_widget -> selection.end.col;
@@ -2525,16 +2550,16 @@ gboolean terminal_widget_get_selected_text(TerminalWidget * terminal_widget, Str
 
 	*buffer = string_buffer_new(1);
 	if (r1 == r2){
-		terminal_widget_selection_add(screen, *buffer, r1, c1, c2);
+		terminal_widget_selection_add(terminal_widget, *buffer, r1, c1, c2);
 	}else{
-		terminal_widget_selection_add(screen, *buffer, r1, c1, -1);
+		terminal_widget_selection_add(terminal_widget, *buffer, r1, c1, -1);
 		string_buffer_append_string(*buffer, "\n", 1);
 		int r;
 		for (r = r1 + 1; r < r2; r++){
-			terminal_widget_selection_add(screen, *buffer, r, 0, -1);
+			terminal_widget_selection_add(terminal_widget, *buffer, r, 0, -1);
 			string_buffer_append_string(*buffer, "\n", 1);
 		}
-		terminal_widget_selection_add(screen, *buffer, r2, 0, c2);
+		terminal_widget_selection_add(terminal_widget, *buffer, r2, 0, c2);
 	}
 
 	return TRUE;
