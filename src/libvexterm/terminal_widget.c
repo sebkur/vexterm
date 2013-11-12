@@ -1971,7 +1971,7 @@ void terminal_widget_handle_csi(TerminalHandler * terminal_handler, Csi * csi)
 					break;
 				}
 				case 2:{ // VT52 Mode (DECANM)
-					if (csi -> suffix1 == 'h'); ; // only 'h'
+					if (csi -> suffix1 == 'h'); // only 'h'
 					#if DEBUG_KNOWN_BUT_UNHANDLED_CSIS
 					printf("|TODO: DECANM|"); fflush(NULL);
 					#endif
