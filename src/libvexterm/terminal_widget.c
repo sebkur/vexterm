@@ -2070,8 +2070,9 @@ void terminal_widget_handle_csi(TerminalHandler * terminal_handler, Csi * csi)
 		printf("||GOTO:%d,%d||", r, c); fflush(NULL);
 		#endif
 		cursor_goto(terminal_widget, r, c);
-	}else if(csi -> suffix1 == 'd'){ //this is bogus?
-		int r = 1, c = 1; // appropriate default values
+	}else if(csi -> suffix1 == 'd'){ // If col not present, don't change it
+		// This behaviour has been guessed
+		int r = 1, c = terminal_widget -> screen_current -> ccol;
 		if (csi -> nums -> len == 1){
 			gpointer num = g_array_index(csi -> nums, gpointer, 0);
 			r = GPOINTER_TO_INT(num);
