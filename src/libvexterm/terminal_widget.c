@@ -597,6 +597,8 @@ static gboolean terminal_widget_key_press(GtkWidget * widget, GdkEventKey * even
 		|| event -> keyval == GDK_Control_R
 		|| event -> keyval == GDK_Alt_L
 		|| event -> keyval == GDK_Alt_R
+		|| event -> keyval == GDK_Super_L
+		|| event -> keyval == GDK_Super_R
 		|| event -> keyval == GDK_ISO_Level3_Shift){
 		return TRUE;
 	}
