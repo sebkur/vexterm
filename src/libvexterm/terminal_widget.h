@@ -155,6 +155,9 @@ struct _TerminalWidget
 	int margin_position;
 
 	GtkIMContext *im_context;
+
+	int saved_cursor_row;
+	int saved_cursor_col;
 };
 
 struct _TerminalWidgetClass

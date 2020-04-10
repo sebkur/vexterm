@@ -1777,6 +1777,18 @@ void use_alternate_screen(TerminalWidget * terminal_widget)
 	emit_set_screen(terminal_widget);
 }
 
+void cursor_save(TerminalWidget * terminal_widget)
+{
+	terminal_widget -> saved_cursor_row = terminal_widget -> screen_current -> crow;
+	terminal_widget -> saved_cursor_col = terminal_widget -> screen_current -> ccol;
+}
+
+void cursor_restore(TerminalWidget * terminal_widget)
+{
+	terminal_widget -> screen_current -> crow = terminal_widget -> saved_cursor_row;
+	terminal_widget -> screen_current -> ccol = terminal_widget -> saved_cursor_col;
+}
+
 void cursor_goto(TerminalWidget * terminal_widget, int r, int c)
 {
 	TerminalScreen * screen = terminal_widget -> screen_current;
@@ -2306,15 +2318,11 @@ void terminal_widget_handle_escaped(TerminalHandler * terminal_handler, char c)
 			break;
 		}
 		case '7':{ // Save Cursor (DECSC)
-			#if DEBUG_KNOWN_BUT_UNHANDLED_ESCAPES
-			printf("||TODO: Save Cursor||"); fflush(NULL);
-			#endif
+			cursor_save(terminal_widget);
 			break;
 		}
 		case '8':{ // Restore Cursor (DECRC)
-			#if DEBUG_KNOWN_BUT_UNHANDLED_ESCAPES
-			printf("||TODO: Restore Cursor||"); fflush(NULL);
-			#endif
+			cursor_restore(terminal_widget);
 			break;
 		}
 		case '=':{ // Application Keypad Mode (DECKPAM)
