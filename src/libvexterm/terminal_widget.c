@@ -2218,6 +2218,12 @@ void terminal_widget_handle_csi(TerminalHandler * terminal_handler, Csi * csi)
 		#if DEBUG_KNOWN_CSIS || DEBUG_SCROLLING_AREA
 		printf("||SCROLLING AREA: %d:%d||", t, b); fflush(NULL);
 		#endif
+		if (t < 1) {
+			t = 1;
+		}
+		if (b > terminal_widget -> n_rows) {
+			b = terminal_widget -> n_rows;
+		}
 		terminal_widget -> screen_current -> scroll_top = t;
 		terminal_widget -> screen_current -> scroll_bot = b;
 	}else if(csi -> suffix1 == 'm'){
