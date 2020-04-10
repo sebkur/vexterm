@@ -2070,7 +2070,7 @@ void terminal_widget_handle_csi(TerminalHandler * terminal_handler, Csi * csi)
 				}
 			}
 		}
-	}else if (csi -> suffix1 == 'H'){ // goto
+	}else if (csi -> suffix1 == 'H' || csi -> suffix1 == 'f'){ // goto
 		int r = 1, c = 1; // appropriate default values
 		if (csi -> nums -> len >= 1){
 			gpointer num = g_array_index(csi -> nums, gpointer, 0);
