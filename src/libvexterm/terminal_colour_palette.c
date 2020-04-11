@@ -66,8 +66,8 @@ TerminalColourPalette * terminal_colour_palette_new_default()
 {
 	TerminalColourPalette * tcp = g_object_new(LIBVEX_TYPE_TERMINAL_COLOUR_PALETTE, NULL);
 	int colours[][4] = {
-		{0x0000, 0x0000, 0x0000, 0xFFFF}, // foreground
-		{0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF}, // background
+		{0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF}, // foreground
+		{0x0000, 0x0000, 0x0000, 0xFFFF}, // background
 
 		{0x0000, 0x0000, 0x0000, 0xFFFF}, // black
 		{0xAA00, 0x0000, 0x0000, 0xFFFF}, // red
