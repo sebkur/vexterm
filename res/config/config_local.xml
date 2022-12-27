@@ -8,7 +8,7 @@
 
 	<profiles>
 		<profile name="foo">
-			<font name="Courier" size="9" />
+			<font name="Courier New" size="9" />
 			<colours scheme="default" />
 		</profile>
 		<profile name="bar">
